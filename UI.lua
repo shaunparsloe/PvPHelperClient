@@ -323,7 +323,7 @@ function PvPHelper_UI_SetupCCButtonWithClass(setbutton)
 
   if not foundfoe then
     --print("ADDED FOE "..tostring(foe.Name).." (".. tostring(foe.GUID) ..") TO FOE LIST")
-    GVAR.PvPServer.FoeList:Add(foe);
+    GVAR.PvPServer.FoeList:Add(deepcopy(foe));
   else
     --print("FOUND FOE "..tostring(foe.Name).." (".. tostring(foe.GUID) ..") IN FOE LIST")
   end
