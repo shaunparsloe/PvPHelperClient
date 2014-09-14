@@ -27,7 +27,7 @@ function PvPHelper:MyCCTypes()
   
   for i,cctype in ipairs(self.AllCCTypes) do
     if IsPlayerSpell(cctype.SpellId) then
-      myCCTypes:Add(deepcopy(cctype));
+      myCCTypes:Add(cctype)
       print("DEBUG: PVPHELPER: My CCType "..cctype.CCName);
     end
   end
@@ -35,31 +35,38 @@ function PvPHelper:MyCCTypes()
 end
 
 function PvPHelper:MessageReceived(strPrefix, strMessage, strType, strSender)
-	--print("PvPHelper:MessageReceived "..strMessage)
-	self.Message:Format(strPrefix, strMessage, strType, strSender)
-	if (self.Message.Header)=="WhatSpellsDoYouHave" then -- 0010 = What spells do you have
-		--print("PvPHelper: Been asked which spells I have, reply with a list of my spells");
-		self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
-	elseif (self.Message.Header)=="SetCCTarget" then -- 0030 = Set CCTarget
-		self:SetCCTarget(self.Message.Body)
-	elseif (self.Message.Header)=="SetMainAssist" then -- 0040 = Set Main Assist
-		self:SetMainAssist(self.Message.Body)
-	elseif (self.Message.Header)=="PrepareToAct" then -- 0050 = PrepareToAct
-		self:PrepareToAct(self.Message.Body);
-	elseif (self.Message.Header)=="DoActionNow" then -- 0060 = DoActionNow
-		self:DoCCActionNow(self.Message.Body);
-	end
+	print("PvPHelper:MessageReceived "..strMessage)
+  self.Message:Format(strPrefix, strMessage, strType, strSender)
+  print(self.Message.Header);
+  if (self.Message.Header)=="WhatSpellsDoYouHave" then -- 0010 = What spells do you have
+    print("PvPHelper: Been asked which spells I have, reply with a list of my spells");
+    self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
+  elseif (self.Message.Header)=="SetCCTarget" then -- 0030 = Set CCTarget
+    self:SetCCTarget(self.Message.Body)
+  elseif (self.Message.Header)=="SetMainAssist" then -- 0040 = Set Main Assist
+    self:SetMainAssist(self.Message.Body)
+  elseif (self.Message.Header)=="PrepareToAct" then -- 0050 = PrepareToAct
+    self:PrepareToAct(self.Message.Body);
+  elseif (self.Message.Header)=="DoActionNow" then -- 0060 = DoActionNow
+    self:DoCCActionNow(self.Message.Body);
+  end
 end
 
 function PvPHelper:SendMessage(strMessage, strTarget)
-	--print("DEBUG:PvPHelper:SendMessage: Sending message to server("..self.Message.From..") "..strMessage.." - "..strTarget);
-	if (self.Message.From) then -- can only reply to server messages
-  		--self.Message.Prefix = "NEWPvPHelper";
-    	self.Message:SendMessagePrefixed("PvPHelperServer", strMessage, strTarget, self.Message.From);
-	end
+	print("Sending message to server("..self.Message.From..") "..strMessage.." - "..strTarget);
+  if (self.Message.From) then -- can only reply to server messages
+  	--self.Message.Prefix = "NEWPvPHelper";
+    self.Message:SendMessagePrefixed("PvPHelperServer", strMessage, strTarget, self.Message.From);
+  end
 end
 
 
+function PvPHelper:SendMessage23456(strMessage, strTarget)
+	print("Sending message to server("..self.Message.From..") "..strMessage.." - "..strTarget);
+  if (self.Message.From) then -- can only reply to server messages
+    self.Message:SendMessagePrefixed("PvPHelperServer", strMessage, strTarget, self.Message.From);
+  end
+end
 
 
 --Conditional depending on test/live
@@ -114,30 +121,39 @@ function PvPHelper_OnEvent(frame, event, ...)
 	
 	if event == "PLAYER_REGEN_DISABLED" then
 		pvpHelper.InCombat = true;
-		
 	elseif event == "PLAYER_REGEN_ENABLED" then
 		pvpHelper.InCombat = false;
-		
-	elseif event == "PLAYER_ENTERING_WORLD" then
-    	print("PVPHELPER IS IN THE HOUSE!!!")
-    	
+  elseif event == "PLAYER_ENTERING_WORLD" then
+    print("PVPHELPER IS IN THE HOUSE!!!")
 	elseif event == "UNIT_SPELLCAST_SUCCEEDED" then
 
-		local ccType = frame.parent.CCTypes:LookupSpellId(sourceName);
-		if ccType then
-			-- print("DEBUG: PvPHelper: This is one of my CC Spells");
-			pvpHelper.SpellsOnCooldown:Add(deepcopy(ccType));
-		 	pvpHelper:SendMessage("ThisSpellIsOnCooldown", tostring(ccType.SpellId))
-
-			-- print("DEBUG: PvPHelper: SpellCoolDown", "SPELL-"..tostring(ccType.SpellId))
-		else
-			-- print("DEBUG: PvPHelper: Not one of my CC Spells");
-		end
+--	print("UNIT_SPELLCAST_SUCCEEDED!")
+--	print("ts:"..tostring(timestamp)
+--	.."|Ev:"..tostring(Event)
+--	.."|HC".. tostring(hideCaster)
+--	.."|SG".. tostring(sourceGUID)
+--	.."|SN".. tostring(sourceName)
+--	.."|SF".. tostring(sourceFlags))
+	local ccType = frame.parent.CCTypes:LookupSpellId(sourceName);
+	if ccType then
+		print("This is one of my CC Spells");
+		-- TODO: Remove this comment
+		-- Need to comment this out to try to debug why the system keeps crashing when 2x
+		-- ccTypes are run together
+		pvpHelper.SpellsOnCooldown:Add(ccType);
 		
+		pvpHelper:SendMessage("SpellCoolDown", "SPELL-"..tostring(ccType.SpellId))
+--		pvpHelper:SendMessage23456("ThisSpellIsOnCooldown123456", tostring(ccType.SpellId))
+--    self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
+
+	else
+		print("Not one of my CC Spells");
+	end
 --	pvpHelper:SendMessage("ThisSpellIsOnCooldown", tostring(pvpHelper.CCSpellId))
 	
   elseif event == "CHAT_MSG_ADDON" then
 --	print("PvPHelperClient-MESSAGE RECEIVED with stamp "..timestamp.." - "..tostring(Event))
+	
     if (timestamp == "PvPHelperClient") then
       pvpHelper:MessageReceived(tostring(timestamp), tostring(Event), tostring(hideCaster), tostring(sourceGUID))
 --	else
@@ -148,14 +164,14 @@ function PvPHelper_OnEvent(frame, event, ...)
   end
 end
 
-
-
 function PVPHelper_OnUpdate(frame, elapsed)
 
   
   frame.TimeSinceLastUpdate = frame.TimeSinceLastUpdate + elapsed; 	
 
   if (frame.TimeSinceLastUpdate > GVAR.UpdateInterval) then
+    
+    -- If we have notified the server that it's on cooldown, but now it's available, tell the server.
     
     local pvpHelper = frame.parent;
 
@@ -168,13 +184,13 @@ function PVPHelper_OnUpdate(frame, elapsed)
 			--print("Checking if ".. spell.SpellId.. " is useable");
 			
 			if enabled == 0 then
---			 	DEFAULT_CHAT_FRAME:AddMessage("Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
+--			 DEFAULT_CHAT_FRAME:AddMessage("Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
 			elseif ( start > 0 and duration > 0) then
---				DEFAULT_CHAT_FRAME:AddMessage("Spell is cooling down, wait " .. (start + duration - GetTime()) .. " seconds for the next one.");
+--			 DEFAULT_CHAT_FRAME:AddMessage("Spell is cooling down, wait " .. (start + duration - GetTime()) .. " seconds for the next one.");
 			else
---				DEFAULT_CHAT_FRAME:AddMessage("Spell is ready.");
-			 	pvpHelper.SpellsOnCooldown:Delete(spell);
-			 	pvpHelper:SendMessage("ThisSpellIsOffCooldown", tostring(spell.SpellId))
+--			 DEFAULT_CHAT_FRAME:AddMessage("Spell is ready.");
+			 pvpHelper.SpellsOnCooldown:Delete(spell);
+			 --pvpHelper:SendMessage("ThisSpellIsOffCooldown", tostring(spell.SpellId))
 			end
 			
 --			if (enabled == 0) then
@@ -185,7 +201,6 @@ function PVPHelper_OnUpdate(frame, elapsed)
 			
 			
 		end
-		
 --    -- Do we have a spell that we're told to cast?
 --    if pvpHelper.CCSpellId then
 --      usable, nomana = IsUsableSpell(pvpHelper.CCSpellId);
@@ -218,9 +233,12 @@ function PVPHelper_OnUpdate(frame, elapsed)
 end
 
 
+
+print("LOADING PVPHELPER")
 local pvpHelper = PvPHelper.new();
 
 pvpHelper:RegisterMainFrameEvents(pvpHelper.UI.MainFrame)
 
 RegisterAddonMessagePrefix("PvPHelperClient");
+--RegisterAddonMessagePrefix("PvPHelperServer");
 
