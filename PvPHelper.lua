@@ -35,11 +35,11 @@ function PvPHelper:MyCCTypes()
 end
 
 function PvPHelper:MessageReceived(strPrefix, strMessage, strType, strSender)
-	print("PvPHelper:MessageReceived "..strMessage)
+	print("DEBUG:PvPHelper:MessageReceived "..strMessage)
   self.Message:Format(strPrefix, strMessage, strType, strSender)
   --print(tostring(self.Message.Header));
   if (self.Message.Header)=="WhatSpellsDoYouHave" then -- 0010 = What spells do you have
-    print("PvPHelper: Been asked which spells I have, reply with a list of my spells");
+    -- print("DEBUGPvPHelper: Been asked which spells I have, reply with a list of my spells");
     self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
   elseif (self.Message.Header)=="SetCCTarget" then -- 0030 = Set CCTarget
     self:SetCCTarget(self.Message.Body)
@@ -55,11 +55,11 @@ function PvPHelper:MessageReceived(strPrefix, strMessage, strType, strSender)
 end
 
 function PvPHelper:SendMessage(strMessage, strTarget)
-	print("Sending message to server("..self.Message.From..") "..strMessage.." - "..strTarget);
-  if (self.Message.From) then -- can only reply to server messages
+	-- print("DEBUG: Sending message to server("..self.Message.From..") "..strMessage.." - "..strTarget);
+	if (self.Message.From) then -- can only reply to server messages
   	--self.Message.Prefix = "NEWPvPHelper";
-    self.Message:SendMessagePrefixed("PvPHelperServer", strMessage, strTarget, self.Message.From);
-  end
+		self.Message:SendMessagePrefixed("PvPHelperServer", strMessage, strTarget, self.Message.From);
+	end
 end
 
 
@@ -78,12 +78,12 @@ end
 --end
 
 function PvPHelper:PrepareToAct(spellId)
-	print("PVPHELPER: Asked to Prepare to  act on spellid"..spellId);
+--	print("PVPHELPER: Asked to Prepare to  act on spellid"..spellId);
   self.UI:PrepareToAct(spellId)
 end
 
 function PvPHelper:DoCCActionNow(spellId)
-	print("PVPHELPER: Asked to Prepare to  act on spellid"..spellId);
+--	print("PVPHELPER: ACT NOW on spellid"..spellId);
   self.UI:DoCCActionNow(spellId)
 end
 
