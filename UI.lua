@@ -12,7 +12,7 @@ function PvPHelper_UI.new (parentObject)
   self.MainFrame.parent = parentObject; -- Cyclical call back to self.  This is used so the eventhandler can pick up the object
 
   -- Create Assist Button
-  local button = self:CreateStandardButton(self.MainFrame, 10, -10, "ASSIST")
+  local button = self:CreateStandardButton(self.MainFrame, 210, -100, "ASSIST")
 	button 	:SetScript("OnClick", function(self, button, down)
 		print("PvPHelper: Been asked which spells I have, reply with a list of my spells");
 --		PVPHelper_MainFrame.parent:SendMessage("MySpells", PVPHelper_MainFrame.parent.CCTypes:ListSpellIds())
@@ -86,11 +86,13 @@ function PvPHelper_UI:CreateMainFrame()
 
 	fontstring = frame:CreateFontString("PVPHelperText", "ARTWORK","GameFontNormal")
 	fontstring:SetPoint("TOPLEFT", 5, -15);
-	fontstring:SetSize(128, 12);
+	fontstring:SetSize(328, 12);
   frame:SetUserPlaced(true);
 
 -- TODO: Run this and see where it appears!
   fontstring:SetText("fontstring set in UI.lua");
+  
+  frame.StatusText = fontstring;
   
   frame.MessageText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
   frame.MessageText:SetPoint("TOPLEFT",0,"TOPLEFT",0,-50)

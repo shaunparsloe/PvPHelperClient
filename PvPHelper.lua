@@ -8,8 +8,8 @@ GVAR.UpdateInterval = 1.0; -- How often the OnUpdate code will run (in seconds)
 function PvPHelper.new (options)
   local self = setmetatable({}, PvPHelper)
   self.AllCCTypes = CCTypeList:LoadAllCCTypes();
-  self.Message = Message.new();
-	self.Message.Prefix = "PvPHelperServer";
+  self.Message = deepcopy(Message.new());
+	self.Message.ReceivePrefix = "PvPHelperClient";
 
   self.CCTypes = self:MyCCTypes();
   self.SpellsOnCooldown = CCTypeList.new();
@@ -61,12 +61,6 @@ function PvPHelper:SendMessage(strMessage, strTarget)
 end
 
 
-function PvPHelper:SendMessage23456(strMessage, strTarget)
-	print("Sending message to server("..self.Message.From..") "..strMessage.." - "..strTarget);
-  if (self.Message.From) then -- can only reply to server messages
-    self.Message:SendMessagePrefixed("PvPHelperServer", strMessage, strTarget, self.Message.From);
-  end
-end
 
 
 --Conditional depending on test/live
