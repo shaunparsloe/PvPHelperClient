@@ -85,8 +85,8 @@ function PvPHelper_UI:CreateMainFrame()
 	frame:SetHeight(100);
 
 	fontstring = frame:CreateFontString("PVPHelperText", "ARTWORK","GameFontNormal")
-	fontstring:SetPoint("TOPLEFT", 5, -15);
-	fontstring:SetSize(328, 12);
+	fontstring:SetPoint("TOPLEFT", -5, -15);
+	fontstring:SetSize(350, 12);
   frame:SetUserPlaced(true);
 
 -- TODO: Run this and see where it appears!
@@ -205,26 +205,28 @@ end
 
 function PvPHelper_UI:PrepareToAct(spellId)
   -- Must display the text.
-  local objSpell = self.parent.AllCCTypes:LookupSpellId(spellId)
-  if objSpell then
-    print("TODO: Analysis on how to best display the PvPHelper:UI:PrepareToAct action") 
-    print("SHOUT: GET READY TO "..objSpell.CCName)
-    -- Must have a window text that we can set:
-
-  end
+  	local objSpell = self.parent.AllCCTypes:LookupSpellId(spellId)
+	if objSpell then
+--   		print("TODO: Analysis on how to best display the PvPHelper:UI:PrepareToAct action") 
+		--print("SHOUT: GET READY TO "..spellId)
+		self.MainFrame.StatusText:SetText("Prepare to "..objSpell.CCName);
+	else
+		print("PvPHelper_UI:PrepareToAct: CANNOT FIND SPELL:"..spellId);
+		
+	end
 end
 
 function PvPHelper_UI:DoCCActionNow(spellId)
-  -- Must display the text.
-  for i, CCActionButton in ipairs(self.CCActionButtons) do
-    --print("CCACTIONBUTTON spellid = "..tostring(CCActionButton.SpellId))
-    --print("CCACTIONBUTTON DoCCActionNow spellid = "..tostring(spellId))
-    if CCActionButton.SpellId == tonumber(spellId) then
-      self:EnableButton(CCActionButton)
-    else
-      self:DisableButton(CCActionButton)
-    end
-  end
+ -- Must display the text.
+  	local objSpell = self.parent.AllCCTypes:LookupSpellId(spellId)
+	if objSpell then
+--   		print("TODO: Analysis on how to best display the PvPHelper:UI:PrepareToAct action") 
+		--print("SHOUT: GET READY TO "..spellId)
+		self.MainFrame.StatusText:SetText("Do "..objSpell.CCName.." NOW!");
+	else
+		print("PvPHelper_UI:DoCCActionNow: CANNOT FIND SPELL:"..spellId);
+	end
+
 end
 
 function PvPHelper_UI:SetCCButton(guid)
