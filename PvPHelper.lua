@@ -8,8 +8,8 @@ GVAR.UpdateInterval = 1.0; -- How often the OnUpdate code will run (in seconds)
 function PvPHelper.new (options)
   local self = setmetatable({}, PvPHelper)
   self.AllCCTypes = CCTypeList:LoadAllCCTypes();
-  self.Message = Message.new();
-	self.Message.Prefix = "PvPHelperServer";
+  self.Message = deepcopy(Message.new());
+	self.Message.ReceivePrefix = "PvPHelperClient";
 
   self.CCTypes = self:MyCCTypes();
   self.SpellsOnCooldown = CCTypeList.new();
@@ -37,7 +37,7 @@ end
 function PvPHelper:MessageReceived(strPrefix, strMessage, strType, strSender)
 	print("PvPHelper:MessageReceived "..strMessage)
   self.Message:Format(strPrefix, strMessage, strType, strSender)
-  print(self.Message.Header);
+  --print(tostring(self.Message.Header));
   if (self.Message.Header)=="WhatSpellsDoYouHave" then -- 0010 = What spells do you have
     print("PvPHelper: Been asked which spells I have, reply with a list of my spells");
     self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
@@ -47,8 +47,10 @@ function PvPHelper:MessageReceived(strPrefix, strMessage, strType, strSender)
     self:SetMainAssist(self.Message.Body)
   elseif (self.Message.Header)=="PrepareToAct" then -- 0050 = PrepareToAct
     self:PrepareToAct(self.Message.Body);
-  elseif (self.Message.Header)=="DoActionNow" then -- 0060 = DoActionNow
+  elseif (self.Message.Header)=="ActNow" then -- 0060 = DoActionNow
     self:DoCCActionNow(self.Message.Body);
+  else
+  	print("PvPHelper:MessageReceived: Unknown message header: "..tostring(self.Message.Header));
   end
 end
 
@@ -61,12 +63,6 @@ function PvPHelper:SendMessage(strMessage, strTarget)
 end
 
 
-function PvPHelper:SendMessage23456(strMessage, strTarget)
-	print("Sending message to server("..self.Message.From..") "..strMessage.." - "..strTarget);
-  if (self.Message.From) then -- can only reply to server messages
-    self.Message:SendMessagePrefixed("PvPHelperServer", strMessage, strTarget, self.Message.From);
-  end
-end
 
 
 --Conditional depending on test/live
@@ -80,21 +76,17 @@ end
 --  self.MainAssist = guid
 --  UI_SetMainAssist(self.MainAssist)
 --end
---
---function PvPHelper:PrepareToAct(spellId)
---  spellId = tonumber(spellId);
---  self.NextCCSpellId = spellId
---  self.NextCCSpellNotified = false;
---  self.UI:PrepareToAct(spellId)
---end
---
---function PvPHelper:DoCCActionNow(spellId)
---  spellId = tonumber(spellId);
---  self.CCSpellId = spellId
---  self.CCSpellNotified = false;
---  self.UI:DoCCActionNow(spellId)
---end
---
+
+function PvPHelper:PrepareToAct(spellId)
+	print("PVPHELPER: Asked to Prepare to  act on spellid"..spellId);
+  self.UI:PrepareToAct(spellId)
+end
+
+function PvPHelper:DoCCActionNow(spellId)
+	print("PVPHELPER: Asked to Prepare to  act on spellid"..spellId);
+  self.UI:DoCCActionNow(spellId)
+end
+
 
 
 function PvPHelper:RegisterMainFrameEvents(frame)
