@@ -90,6 +90,7 @@ end
 
 function PvPHelper:RegisterMainFrameEvents(frame)
 	frame.TimeSinceLastUpdate = 0;
+	frame.TimerTick = 0;
 	frame:SetScript("OnUpdate", PVPHelper_OnUpdate)
 
 	frame:RegisterEvent("PLAYER_ENTERING_WORLD");
@@ -157,7 +158,16 @@ end
 
 function PVPHelper_OnUpdate(frame, elapsed)
 
+	-- Countdown timer tick
+	frame.TimerTick = frame.TimerTick + elapsed; 	
+	if (frame.TimerTick > 0.1) then
 	
+	
+		frame.TimerTick = 0;
+	end
+	
+
+	-- Check for spell updates
 	frame.TimeSinceLastUpdate = frame.TimeSinceLastUpdate + elapsed; 	
 
 	if (frame.TimeSinceLastUpdate > 0.5) then
@@ -175,21 +185,14 @@ function PVPHelper_OnUpdate(frame, elapsed)
 			--print("Checking if ".. spell.SpellId.. " is useable");
 			
 			if enabled == 0 then
---			 DEFAULT_CHAT_FRAME:AddMessage("Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
+--				DEFAULT_CHAT_FRAME:AddMessage("Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
 			elseif ( start > 0 and duration > 0) then
---			 DEFAULT_CHAT_FRAME:AddMessage("Spell is cooling down, wait " .. (start + duration - GetTime()) .. " seconds for the next one.");
+--				DEFAULT_CHAT_FRAME:AddMessage("Spell is cooling down, wait " .. (start + duration - GetTime()) .. " seconds for the next one.");
 			else
---			 DEFAULT_CHAT_FRAME:AddMessage("Spell is ready.");
+--				DEFAULT_CHAT_FRAME:AddMessage("Spell is ready.");
 				pvpHelper.SpellsOnCooldown:Delete(spell);
-			 --pvpHelper:SendMessage("ThisSpellIsOffCooldown", tostring(spell.SpellId))
+			 	pvpHelper:SendMessage("ThisSpellIsOffCooldown", tostring(spell.SpellId))
 			end
-			
---			if (enabled == 0) then
---				print("This spell is useable again");
---				--pvpHelper:SendMessage("ThisSpellIsOffCooldown", tostring(spell.SpellId))
---				pvpHelper.SpellsOnCooldown:Delete(spell);
---			end
-			
 			
 		end
 	
