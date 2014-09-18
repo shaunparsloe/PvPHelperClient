@@ -14,6 +14,8 @@ Utils.lua
 CCType.lua
 CCTypeList.lua
 Message.lua
+Timer.lua
+TimerList.lua
 
 PVPHelper.lua
 

@@ -17,6 +17,7 @@ function PvPHelper.new (options)
 	self.InCombat = false;
 	self.MyName = UnitName("player").."-"..GetRealmName();
 	self.UI = PvPHelper_UI.new(self);
+	self.Timers = TimerList.new();
 	print("DEBUG: PVPHELPER: Setting MainFrame.PvPHelper to self");
 	return self;
 end
@@ -161,8 +162,10 @@ function PVPHelper_OnUpdate(frame, elapsed)
 	-- Countdown timer tick
 	frame.TimerTick = frame.TimerTick + elapsed; 	
 	if (frame.TimerTick > 0.1) then
-	
-	
+		local pvpHelper = frame.parent;
+
+		pvpHelper.Timers:CheckTimers();
+
 		frame.TimerTick = 0;
 	end
 	
