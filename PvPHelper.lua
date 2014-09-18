@@ -77,9 +77,15 @@ end
 --	UI_SetMainAssist(self.MainAssist)
 --end
 
-function PvPHelper:PrepareToAct(spellId)
---	print("PVPHELPER: Asked to Prepare to	act on spellid"..spellId);
-	self.UI:PrepareToAct(spellId)
+function PvPHelper:PrepareToAct(strMessage)
+	print("PVPHELPER: Asked to Prepare to act. Message "..strMessage);
+
+	local messageSplit = string_split(strMessage, ",");
+
+    local spellId = messageSplit[1]; -- Will Be "PrepareToAct"
+    local secondsTime = messageSplit[2];
+
+	self.UI:PrepareToAct(spellId, secondsTime)
 end
 
 function PvPHelper:DoCCActionNow(spellId)

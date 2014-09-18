@@ -203,13 +203,13 @@ function PvPHelper_UI:CreatePlayerButton(frame, strButtonName, ofsx, ofsy, butto
 end
 
 
-function PvPHelper_UI:PrepareToAct(spellId)
+function PvPHelper_UI:PrepareToAct(spellId, secondsTime)
   -- Must display the text.
   	local objSpell = self.parent.AllCCTypes:LookupSpellId(spellId)
 	if objSpell then
 --   		print("TODO: Analysis on how to best display the PvPHelper:UI:PrepareToAct action") 
 		--print("SHOUT: GET READY TO "..spellId)
-		self.MainFrame.StatusText:SetText("Prepare to "..objSpell.CCName);
+		self.MainFrame.StatusText:SetText("Prepare to "..objSpell.CCName.." in "..secondsTime.." seconds");
 	else
 		print("PvPHelper_UI:PrepareToAct: CANNOT FIND SPELL:"..spellId);
 		
