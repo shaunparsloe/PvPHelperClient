@@ -49,6 +49,10 @@ function PvPHelper:MessageReceived(strPrefix, strMessage, strType, strSender)
 		self:PrepareToAct(self.Message.Body);
 	elseif (self.Message.Header)=="ActNow" then -- 0060 = DoActionNow
 		self:DoCCActionNow(self.Message.Body);
+	elseif (self.Message.Header)=="LateActNow" then -- 0060 = DoActionNow
+		self:DoLateCCAction(self.Message.Body);
+	elseif (self.Message.Header)=="VeryLateActNow" then -- 0060 = DoActionNow
+		self:DoVeryLateCCAction(self.Message.Body);
 	else
 		print("PvPHelper:MessageReceived: Unknown message header: "..tostring(self.Message.Header));
 	end
@@ -93,7 +97,15 @@ function PvPHelper:DoCCActionNow(spellId)
 	self.UI:DoCCActionNow(spellId)
 end
 
+function PvPHelper:DoLateCCAction(spellId)
+--	print("PVPHELPER: ACT NOW on spellid"..spellId);
+	self.UI:DoLateCCAction(spellId)
+end
 
+function PvPHelper:DoVeryLateCCAction(spellId)
+--	print("PVPHELPER: ACT NOW on spellid"..spellId);
+	self.UI:DoVeryLateCCAction(spellId)
+end
 
 function PvPHelper:RegisterMainFrameEvents(frame)
 	frame.TimeSinceLastUpdate = 0;

@@ -229,6 +229,32 @@ function PvPHelper_UI:DoCCActionNow(spellId)
 
 end
 
+function PvPHelper_UI:DoLateCCAction(spellId)
+ -- Must display the text.
+  	local objSpell = self.parent.AllCCTypes:LookupSpellId(spellId)
+	if objSpell then
+--   		print("TODO: Analysis on how to best display the PvPHelper:UI:PrepareToAct action") 
+		--print("SHOUT: GET READY TO "..spellId)
+		self.MainFrame.StatusText:SetText("LATE! Do "..objSpell.CCName.." NOW!");
+	else
+		print("PvPHelper_UI:DoCCActionNow: CANNOT FIND SPELL:"..spellId);
+	end
+
+end
+
+function PvPHelper_UI:DoVeryLateCCAction(spellId)
+ -- Must display the text.
+  	local objSpell = self.parent.AllCCTypes:LookupSpellId(spellId)
+	if objSpell then
+--   		print("TODO: Analysis on how to best display the PvPHelper:UI:PrepareToAct action") 
+		--print("SHOUT: GET READY TO "..spellId)
+		self.MainFrame.StatusText:SetText("VERY LATE! Do "..objSpell.CCName.." NOW!");
+	else
+		print("PvPHelper_UI:DoCCActionNow: CANNOT FIND SPELL:"..spellId);
+	end
+
+end
+
 function PvPHelper_UI:SetCCButton(guid)
   --print("Setting CC Target Button")
   if (self.CCTargetButton) then
