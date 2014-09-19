@@ -84,15 +84,23 @@ function PvPHelper_UI:CreateMainFrame()
 	frame:SetWidth(300); 
 	frame:SetHeight(100);
 
-	fontstring = frame:CreateFontString("PVPHelperText", "ARTWORK","GameFontNormal")
-	fontstring:SetPoint("TOPLEFT", -5, -15);
-	fontstring:SetSize(350, 12);
   frame:SetUserPlaced(true);
 
 -- TODO: Run this and see where it appears!
-  fontstring:SetText("fontstring set in UI.lua");
+	fontstring = frame:CreateFontString("PVPHelperText", "ARTWORK","GameFontNormal")
+	fontstring:SetPoint("TOPLEFT", -5, -15);
+	fontstring:SetSize(350, 12);
+	fontstring:SetText("fontstring set in UI.lua");
+	  
+	frame.StatusText = fontstring;
+
+  	fontstring = frame:CreateFontString("PVPHelperText", "ARTWORK","GameFontNormal")
+	fontstring:SetPoint("TOPLEFT", -5, -15);
+	fontstring:SetSize(350, 52);
+	fontstring:SetText("0");
+	  
+	frame.TimerText = fontstring;
   
-  frame.StatusText = fontstring;
   
   frame.MessageText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
   frame.MessageText:SetPoint("TOPLEFT",0,"TOPLEFT",0,-50)
@@ -253,6 +261,11 @@ function PvPHelper_UI:DoVeryLateCCAction(spellId)
 		print("PvPHelper_UI:DoCCActionNow: CANNOT FIND SPELL:"..spellId);
 	end
 
+end
+
+function PvPHelper_UI:Tick(param)
+	--print("Tick:"..tostring(param));
+	self.MainFrame.TimerText:SetText(param);
 end
 
 function PvPHelper_UI:SetCCButton(guid)

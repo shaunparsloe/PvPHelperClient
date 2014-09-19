@@ -88,8 +88,18 @@ function PvPHelper:PrepareToAct(strMessage)
 
     local spellId = messageSplit[1]; -- Will Be "PrepareToAct"
     local secondsTime = messageSplit[2];
-
+	
+	print("Adding timer with duration = "..secondsTime);
+	local timer = Timer.new({TimerId=spellId, Duration = secondsTime, parent=self})
+	self.Timers:Add(timer);
+	
 	self.UI:PrepareToAct(spellId, secondsTime)
+end
+
+
+function PvPHelper:Tick(seconds)
+--	print("PVPHELPER: ACT NOW on spellid"..spellId);
+	self.UI:Tick(seconds)
 end
 
 function PvPHelper:DoCCActionNow(spellId)

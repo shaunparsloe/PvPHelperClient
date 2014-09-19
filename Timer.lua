@@ -9,15 +9,16 @@ function Timer.new (options)
 	-- the new instance
 	local self = setmetatable(
 	{	
-		CallbackFunction_TimerEnds = options.TimerEndsFunction,
+		parent = options.parent,
+		TimerId = options.TimerId,
 		Duration = options.Duration, 
 		StartTime = time(),
 		ExecuteTime = options.ExecuteTime
 	}
 	, Timer)
-	
-	if not (self.CallbackFunction_TimerEnds) then
-		print("ERROR SETTING UP TIMER. Missing callback function");
+		
+	if not self.TimerId then
+		print("ERROR SETTING UP TIMER: MISSING TIMERID");
 	end
 	
 	if self.Duration and not self.ExecuteTime then
@@ -27,6 +28,8 @@ function Timer.new (options)
 	if self.ExecuteTime and not self.Duration then
 		self.Duration = self.ExecuteTime - self.StartTime;
 	end
+	
+	print("Added Timer: Duration: "..self.Duration..", executes: "..self.ExecuteTime);
 	
 	-- return the instance
 	return self;
@@ -49,6 +52,10 @@ function Timer:IsActive()
 	end
 
 	return retval;
+end
+
+function Timer:TimeRemaining()
+	return self.ExecuteTime - time();
 end
 
 
