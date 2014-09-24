@@ -10,7 +10,6 @@
 Localization.lua
 
 UI.lua
-Utils.lua
 CCType.lua
 CCTypeList.lua
 Message.lua

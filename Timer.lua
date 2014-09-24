@@ -12,7 +12,7 @@ function Timer.new (options)
 		parent = options.parent,
 		TimerId = options.TimerId,
 		Duration = options.Duration, 
-		StartTime = time(),
+		StartTime = GetTime(),
 		ExecuteTime = options.ExecuteTime
 	}
 	, Timer)
@@ -37,7 +37,7 @@ end
 
 -- Restart for whatever the duration is.
 function Timer:Start()
-	self.StartTime = time()
+	self.StartTime = GetTime()
 	self.ExecuteTime = self.StartTime + self.Duration
 	return self
 end
@@ -45,7 +45,7 @@ end
 
 function Timer:IsActive()
 	local retval = false;
-	if (self.ExecuteTime > time()) then
+	if (self.ExecuteTime > GetTime()) then
 		retval = true;
 	else
 		retval = false;
@@ -55,7 +55,7 @@ function Timer:IsActive()
 end
 
 function Timer:TimeRemaining()
-	return self.ExecuteTime - time();
+	return self.ExecuteTime - GetTime();
 end
 
 
