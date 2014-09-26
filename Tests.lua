@@ -28,10 +28,10 @@ GVAR.MessageLog = {};
 function TEST_MESSAGE_WHATSPELLSDOYOUHAVE()
 
   -- Arrange
-  objPvPHelper = PvPHelperClient.new()
+  objPvPHelperClient = PvPHelperClient.new()
   
   -- Act
-  objPvPHelper:MessageReceived("PvPHelperClient", "WhatSpellsDoYouHave", "WHISPER", "MrRaidLeader") 
+  objPvPHelperClient:MessageReceived("PvPHelperClient", "WhatSpellsDoYouHave", "WHISPER", "MrRaidLeader") 
   
   -- Server sends to client, "What spells do you have", 
   -- Client responds with, "I have xxx spells"
@@ -42,30 +42,14 @@ function TEST_MESSAGE_WHATSPELLSDOYOUHAVE()
   TESTAssert("1776,2094", GVAR.MessageLog[1].Body, "List of my spells");
 
  end
-
-function TEST_MESSAGE_PREPARETOACT()
-  
-  -- Arrange
-  objPvPHelper = PvPHelperClient.new()
-  
-  -- Act
-  -- Get a note to prepare to act in 25 sec.
-  objPvPHelper:MessageReceived("PvPHelperClient", "PrepareToAct.1776,25", "WHISPER", "MrRaidLeader") 
-  
-  -- Rubbish.  TODO: Fix this bit:
-   TESTAssert(1, table.getn(GVAR.MessageLog), "Should send new messages to server");
-
-
-end
-
 function TEST_MESSAGE_ACTNOW()
   -- Arrange - Tell the PVPHelper to DoActionNow
-  objPvPHelper = PvPHelperClient.new()
-  objPvPHelper:MessageReceived("PvPHelperClient", "ActNow.1776", "WHISPER", "MrRaidLeader")   -- ActNow = DoActionNow
+  objPvPHelperClient = PvPHelperClient.new()
+  objPvPHelperClient:MessageReceived("PvPHelperClient", "ActNow.1776", "WHISPER", "MrRaidLeader")   -- ActNow = DoActionNow
 
   -- This should have set up the CCSpellID to 1776 and the CCSpellNotified status to false.
-  TESTAssert(1776, objPvPHelper.CCSpellId, "SET objPvPHelper.CCSpellId")
-  TESTAssert(false, objPvPHelper.CCSpellNotified, "SET objPvPHelper.CCSpellNotified")
+  TESTAssert(1776, objPvPHelperClient.CCSpellId, "SET objPvPHelperClient.CCSpellId")
+  TESTAssert(false, objPvPHelperClient.CCSpellNotified, "SET objPvPHelperClient.CCSpellNotified")
   
   -- Set up the spells that can be cast.  
   DEBUG.spells = {}
@@ -75,18 +59,18 @@ function TEST_MESSAGE_ACTNOW()
  
   -- Act
   local elapsed = 10;
-  PVPHelper_OnUpdate(objPvPHelper.UI.MainFrame, elapsed)
+  PVPHelper_OnUpdate(objPvPHelperClient.UI.MainFrame, elapsed)
   
   -- Assert
   -- So what should happen here is that we should see that this spell is now on cooldown and a message must
   -- be sent to the Server to say that this spell is now on Cooldown.
   
-  TESTAssert("PvPHelperClient", objPvPHelper.Message.Prefix, "Sent SpellIsOnCooldown - Prefix")
-  TESTAssert("0080", objPvPHelper.Message.Header, "Sent SpellIsOnCooldown - Header")
-  TESTAssert("0080:1776", objPvPHelper.Message.Body, "Sent SpellIsOnCooldown - Body")
-  TESTAssert("MrRaidLeader", objPvPHelper.Message.To, "Sent SpellIsOnCooldown - To")
+  TESTAssert("PvPHelperClient", objPvPHelperClient.Message.Prefix, "Sent SpellIsOnCooldown - Prefix")
+  TESTAssert("0080", objPvPHelperClient.Message.Header, "Sent SpellIsOnCooldown - Header")
+  TESTAssert("0080:1776", objPvPHelperClient.Message.Body, "Sent SpellIsOnCooldown - Body")
+  TESTAssert("MrRaidLeader", objPvPHelperClient.Message.To, "Sent SpellIsOnCooldown - To")
   
-  TESTAssert("OnCooldown", objPvPHelper.SpellsOnCooldown[1776], "pvpHelper.SpellsOnCooldown[CCSpellId]")
+  TESTAssert("OnCooldown", objPvPHelperClient.SpellsOnCooldown[1776], "pvpHelper.SpellsOnCooldown[CCSpellId]")
 
   
   -- Now set it up so that the spell is available again
@@ -95,18 +79,18 @@ function TEST_MESSAGE_ACTNOW()
   DEBUG.spells[1776].nomana = nil  -- n/a
  
   -- Act
-  PVPHelper_OnUpdate(objPvPHelper.UI.MainFrame, elapsed)
+  PVPHelper_OnUpdate(objPvPHelperClient.UI.MainFrame, elapsed)
   
   -- Assert
   -- So what should happen here is that we should see that this spell is now on cooldown and a message must
   -- be sent to the Server to say that this spell is now on Cooldown.
   
-  TESTAssert("PvPHelperClient", objPvPHelper.Message.Prefix, "Sent ThisSpellIsOffCooldown - Prefix")
-  TESTAssert("0090", objPvPHelper.Message.Header, "Sent ThisSpellIsOffCooldown - Header")
-  TESTAssert("0090:1776", objPvPHelper.Message.Body, "Sent ThisSpellIsOffCooldown - Body")
-  TESTAssert("MrRaidLeader", objPvPHelper.Message.To, "Sent ThisSpellIsOffCooldown - To")
+  TESTAssert("PvPHelperClient", objPvPHelperClient.Message.Prefix, "Sent ThisSpellIsOffCooldown - Prefix")
+  TESTAssert("0090", objPvPHelperClient.Message.Header, "Sent ThisSpellIsOffCooldown - Header")
+  TESTAssert("0090:1776", objPvPHelperClient.Message.Body, "Sent ThisSpellIsOffCooldown - Body")
+  TESTAssert("MrRaidLeader", objPvPHelperClient.Message.To, "Sent ThisSpellIsOffCooldown - To")
   
-  TESTAssert("nil", tostring(objPvPHelper.SpellsOnCooldown[1776]), "ThisSpellIsOffCooldown CCSpellId")
+  TESTAssert("nil", tostring(objPvPHelperClient.SpellsOnCooldown[1776]), "ThisSpellIsOffCooldown CCSpellId")
 
 
 end
@@ -114,6 +98,39 @@ end
 -- When we cast a spell, it will show up in the Combat_log_events
 --function TEST_EVENT_HAVEJUSTCASTSPELL()
 --end
+
+
+function TEST_MESSAGE_PREPARETOACT()
+  GVAR.MessageLog = {};
+  DEBUG.SetClockSeconds = 100;
+
+  -- Arrange
+  objPvPHelperClient = PvPHelperClient.new()
+  objPvPHelperClient:RegisterMainFrameEvents(objPvPHelperClient.UI.MainFrame)
+
+  -- Act
+  -- Get a note to prepare to act in 25 sec.
+  objPvPHelperClient:MessageReceived("PvPHelperClient", "PrepareToAct.1776,10", "WHISPER", "MrRaidLeader") 
+  elapsed = 1;
+  PVPHelper_OnUpdate(objPvPHelperClient.UI.MainFrame, elapsed) 
+  
+  
+  -- Rubbish.  TODO: Fix this bit:
+   TESTAssert(0, table.getn(GVAR.MessageLog), "Should send new messages to server");
+	TESTAssert(1, table.getn(objPvPHelperClient.Timers),"Should have one timer")
+  
+	TESTAssert(10, objPvPHelperClient.Timers[1]:TimeRemaining(),"With 10 second duration")
+
+  DEBUG.SetClockSeconds = 105;
+	TESTAssert(5, objPvPHelperClient.Timers[1]:TimeRemaining(),"With 5 sec remaining")
+
+  elapsed = 1;
+  PVPHelper_OnUpdate(objPvPHelperClient.UI.MainFrame, elapsed) 
+
+   TESTAssert(0, table.getn(GVAR.MessageLog), "Should send new messages to server");
+	TESTAssert(5, objPvPHelperClient.Timers[1]:TimeRemaining(),"With 5 sec remaining")
+
+end
 
 
 

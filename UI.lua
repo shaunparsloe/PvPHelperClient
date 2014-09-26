@@ -60,7 +60,7 @@ end
 
 
 function PvPHelper_UI:CreateMainFrame()
-	local frame = CreateFrame("Frame", "PVPHelper_MainFrame", UIParent);
+	local frame = CreateFrame("Frame", "PVPHelperClient_MainFrame", UIParent);
 	frame:SetMovable(true)
 	frame:EnableMouse(true)
 	frame:RegisterForDrag("LeftButton")
@@ -263,7 +263,7 @@ function PvPHelper_UI:DoVeryLateCCAction(spellId)
 
 end
 
-function PvPHelper_UI:Tick(param)
+function PvPHelper_UI:SetTimerText(param)
 	--print("Tick:"..tostring(param));
 	self.MainFrame.TimerText:SetText(param);
 end

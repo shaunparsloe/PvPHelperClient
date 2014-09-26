@@ -9,7 +9,8 @@ function PvPHelperClient.new (options)
 	self.AllCCTypes = CCTypeList:LoadAllCCTypes();
 	self.Message = deepcopy(Message.new());
 	self.Message.ReceivePrefix = "PvPHelperClient";
-
+  self.Flags = {};
+  
 	self.CCTypes = self:MyCCTypes();
 	self.SpellsOnCooldown = CCTypeList.new();
 	self.MainAssit = nil;
@@ -39,7 +40,7 @@ function PvPHelperClient:MessageReceived(strPrefix, strMessage, strType, strSend
 	self.Message:Format(strPrefix, strMessage, strType, strSender)
 	print(tostring(self.Message.Header));
 	if (self.Message.Header)=="WhatSpellsDoYouHave" then -- 0010 = What spells do you have
-		-- print("DEBUGPvPHelper: Been asked which spells I have, reply with a list of my spells");
+		print("DEBUGPvPHelper: Been asked which spells I have, reply with a list of my spells");
 		self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
 	elseif (self.Message.Header)=="SetCCTarget" then -- 0030 = Set CCTarget
 		self:SetCCTarget(self.Message.Body)
@@ -99,22 +100,66 @@ end
 
 function PvPHelperClient:Tick(seconds)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
-	self.UI:Tick(seconds)
+  if seconds == 5 then
+    if self.Flags.Do5SecondsSound then
+      self.Flags.Do5SecondsSound = true;
+      self.PlaySound("PrepareTo")
+    end
+  else
+    self.Flags.Do5SecondsSound = nil;
+  end
+  if seconds == 3 then
+    if self.Flags.Do3SecondsSound then
+      self.Flags.Do3SecondsSound = true;
+      self.PlaySound("Countdown_3")
+    end
+  else
+    self.Flags.Do3SecondsSound = nil;
+  end
+  if seconds == 2 then
+    if self.Flags.Do2SecondsSound then
+      self.Flags.Do2SecondsSound = true;
+      self.PlaySound("Countdown_3")
+    end
+  else
+    self.Flags.Do2SecondsSound = nil;
+  end
+  if seconds == 1 then
+    if self.Flags.Do1SecondsSound then
+      self.Flags.Do1SecondsSound = true;
+      self.PlaySound("Countdown_3")
+    end
+  else
+    self.Flags.Do1SecondsSound = nil;
+  end
+	self.UI:SetTimerText(seconds)
+end
+
+function PvPHelperClient:PlaySound(soundFileName)
+  if (soundFileName) then
+  print(soundFileName);
+  if DEBUG.LogSound then
+    GVAR.PlaySound = soundFileName;
+  end
+  end 
 end
 
 function PvPHelperClient:DoCCActionNow(spellId)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:DoCCActionNow(spellId)
+  self.PlaySound("DoActionNow")
 end
 
 function PvPHelperClient:DoLateCCAction(spellId)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:DoLateCCAction(spellId)
+  self.PlaySound("LateDoActionNow")
 end
 
 function PvPHelperClient:DoVeryLateCCAction(spellId)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:DoVeryLateCCAction(spellId)
+  self.PlaySound("VeryLateDoActionNow")
 end
 
 function PvPHelperClient:RegisterMainFrameEvents(frame)
