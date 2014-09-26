@@ -229,8 +229,8 @@ function PvPHelper_UI:DoCCActionNow(spellId)
   	local objSpell = self.parent.AllCCTypes:LookupSpellId(spellId)
 	if objSpell then
 --   		print("TODO: Analysis on how to best display the PvPHelper:UI:PrepareToAct action") 
-		--print("SHOUT: GET READY TO "..spellId)
-		self.MainFrame.StatusText:SetText("Do "..objSpell.CCName.." NOW!");
+		print("SHOUT: GET READY TO "..objSpell.CCName)
+		--self.MainFrame.StatusText:SetText("Do "..objSpell.CCName.." NOW!");
 	else
 		print("PvPHelper_UI:DoCCActionNow: CANNOT FIND SPELL:"..spellId);
 	end

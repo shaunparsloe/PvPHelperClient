@@ -16,6 +16,6 @@ Message.lua
 Timer.lua
 TimerList.lua
 
-PVPHelper.lua
+PVPHelperClient.lua
 
 

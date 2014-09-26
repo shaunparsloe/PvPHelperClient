@@ -1,11 +1,11 @@
-PvPHelper = {}
-PvPHelper.__index = PvPHelper; -- failed table lookups on the instances should fallback to the class table, to get methods
+PvPHelperClient = {}
+PvPHelperClient.__index = PvPHelperClient; -- failed table lookups on the instances should fallback to the class table, to get methods
 
 GVAR = {};
 
 
-function PvPHelper.new (options)
-	local self = setmetatable({}, PvPHelper)
+function PvPHelperClient.new (options)
+	local self = setmetatable({}, PvPHelperClient)
 	self.AllCCTypes = CCTypeList:LoadAllCCTypes();
 	self.Message = deepcopy(Message.new());
 	self.Message.ReceivePrefix = "PvPHelperClient";
@@ -18,11 +18,11 @@ function PvPHelper.new (options)
 	self.MyName = UnitName("player").."-"..GetRealmName();
 	self.UI = PvPHelper_UI.new(self);
 	self.Timers = TimerList.new();
-	print("DEBUG: PVPHELPER: Setting MainFrame.PvPHelper to self");
+	print("DEBUG: PVPHELPER: Setting MainFrame.PvPHelperClient to self");
 	return self;
 end
 
-function PvPHelper:MyCCTypes()
+function PvPHelperClient:MyCCTypes()
 	local myCCTypes = CCTypeList.new();
 	
 	for i,cctype in ipairs(self.AllCCTypes) do
@@ -34,8 +34,8 @@ function PvPHelper:MyCCTypes()
 	return myCCTypes
 end
 
-function PvPHelper:MessageReceived(strPrefix, strMessage, strType, strSender)
-	print("DEBUG:PvPHelper:MessageReceived "..strMessage)
+function PvPHelperClient:MessageReceived(strPrefix, strMessage, strType, strSender)
+	print("DEBUG:PvPHelperClient:MessageReceived "..strMessage)
 	self.Message:Format(strPrefix, strMessage, strType, strSender)
 	print(tostring(self.Message.Header));
 	if (self.Message.Header)=="WhatSpellsDoYouHave" then -- 0010 = What spells do you have
@@ -54,11 +54,11 @@ function PvPHelper:MessageReceived(strPrefix, strMessage, strType, strSender)
 	elseif (self.Message.Header)=="VeryLateActNow" then -- 0060 = DoActionNow
 		self:DoVeryLateCCAction(self.Message.Body);
 	else
-		print("PvPHelper:MessageReceived: Unknown message header: "..tostring(self.Message.Header));
+		print("PvPHelperClient:MessageReceived: Unknown message header: "..tostring(self.Message.Header));
 	end
 end
 
-function PvPHelper:SendMessage(strMessage, strTarget)
+function PvPHelperClient:SendMessage(strMessage, strTarget)
 	-- print("DEBUG: Sending message to server("..self.Message.From..") "..strMessage.." - "..strTarget);
 	if (self.Message.From) then -- can only reply to server messages
 		--self.Message.Prefix = "NEWPvPHelper";
@@ -71,17 +71,17 @@ end
 
 --Conditional depending on test/live
 --
---function PvPHelper:SetCCTarget(guid)
+--function PvPHelperClient:SetCCTarget(guid)
 --	self.CCTarget = guid
 --	self.UI:SetCCButton(self.CCTarget)
 --end
 --
---function PvPHelper:SetMainAssist(guid)
+--function PvPHelperClient:SetMainAssist(guid)
 --	self.MainAssist = guid
 --	UI_SetMainAssist(self.MainAssist)
 --end
 
-function PvPHelper:PrepareToAct(strMessage)
+function PvPHelperClient:PrepareToAct(strMessage)
 	print("PVPHELPER: Asked to Prepare to act. Message "..strMessage);
 
 	local messageSplit = string_split(strMessage, ",");
@@ -97,27 +97,27 @@ function PvPHelper:PrepareToAct(strMessage)
 end
 
 
-function PvPHelper:Tick(seconds)
+function PvPHelperClient:Tick(seconds)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:Tick(seconds)
 end
 
-function PvPHelper:DoCCActionNow(spellId)
+function PvPHelperClient:DoCCActionNow(spellId)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:DoCCActionNow(spellId)
 end
 
-function PvPHelper:DoLateCCAction(spellId)
+function PvPHelperClient:DoLateCCAction(spellId)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:DoLateCCAction(spellId)
 end
 
-function PvPHelper:DoVeryLateCCAction(spellId)
+function PvPHelperClient:DoVeryLateCCAction(spellId)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:DoVeryLateCCAction(spellId)
 end
 
-function PvPHelper:RegisterMainFrameEvents(frame)
+function PvPHelperClient:RegisterMainFrameEvents(frame)
 	frame.TimeSinceLastUpdate = 0;
 	frame.TimerTick = 0;
 	frame:SetScript("OnUpdate", PVPHelper_OnUpdate)
@@ -234,7 +234,7 @@ end
 
 
 print("LOADING PVPHELPER")
-local pvpHelper = PvPHelper.new();
+local pvpHelper = PvPHelperClient.new();
 
 pvpHelper:RegisterMainFrameEvents(pvpHelper.UI.MainFrame)
 
