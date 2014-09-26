@@ -37,7 +37,7 @@ end
 function PvPHelper:MessageReceived(strPrefix, strMessage, strType, strSender)
 	print("DEBUG:PvPHelper:MessageReceived "..strMessage)
 	self.Message:Format(strPrefix, strMessage, strType, strSender)
-	--print(tostring(self.Message.Header));
+	print(tostring(self.Message.Header));
 	if (self.Message.Header)=="WhatSpellsDoYouHave" then -- 0010 = What spells do you have
 		-- print("DEBUGPvPHelper: Been asked which spells I have, reply with a list of my spells");
 		self:SendMessage("MySpells", self.CCTypes:ListSpellIds())

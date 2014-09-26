@@ -4,12 +4,12 @@
 local filepath = "\\Games\\World of Warcraft\\Interface\\AddOns\\PVPHelper\\"
 --local libfilepath = "\\Users\\sparsloe\\Downloads\\ZeroBane\\myprograms\\PVPHelperLibrary\\"
 local libfilepath = "\\Games\\World of Warcraft\\Interface\\AddOns\\PVPHelperLibrary\\"
-dofile(filepath.."Utils.lua")
+dofile(libfilepath.."Utils.lua")
 dofile(libfilepath.."Localization.lua")
 dofile(libfilepath.."CCType.lua")
 dofile(libfilepath.."CCTypeList.lua")
---dofile(libfilepath.."Foe.lua")
---dofile(libfilepath.."FoeList.lua")
+dofile(filepath.."Timer.lua")
+dofile(filepath.."TimerList.lua")
 --dofile(libfilepath.."FoeDR.lua")
 --dofile(libfilepath.."FoeDRList.lua")
 dofile(libfilepath.."Message.lua")
@@ -23,7 +23,7 @@ function TEST_MESSAGES_RECEIVED()
   objPvPHelper = PvPHelper.new()
   
   -- Act
-  objPvPHelper:MessageReceived("PvPHelper", "0999:What spells do you have?") 
+  objPvPHelper:MessageReceived("PvPHelperClient", "WhatSpellsDoYouHave") 
   
   --Assert
   --Functionality
@@ -31,47 +31,11 @@ function TEST_MESSAGES_RECEIVED()
   -- SendMessage("WhatSpellsDoYouHave", toFriend1)
   -- Event will fire: Message received:
   -- Format will be <prefix>:<header>:body  
-  TESTAssert("0999:What spells do you have?",  objPvPHelper.Message.Text, "objPvPHelper.LastMessage")
-  TESTAssert("PvPHelper",  objPvPHelper.Message.Prefix, "objPvPHelper.Prefix")
-  TESTAssert("0999",  objPvPHelper.Message.Header, "objPvPHelper.Header")
-  TESTAssert("What spells do you have?",  objPvPHelper.Message.Body, "objPvPHelper.Body")
+  TESTAssert("WhatSpellsDoYouHave",  objPvPHelper.Message.Text, "objPvPHelper.LastMessage")
+  TESTAssert("WhatSpellsDoYouHave",  objPvPHelper.Message.Header, "objPvPHelper.Header")
   -- objPvPHelper:MessageReceived("MySpells:100,1234,98765")
   -- client responds with - I have xxx spells.
-  
-  -- Arrange
-  objPvPHelper = PvPHelper.new()
-  -- Act
-  objPvPHelper:MessageReceived("PvPHelper", "0888")   
-  --Assert
-  TESTAssert("0888",  objPvPHelper.Message.Text, "objPvPHelper.LastMessage")
-  TESTAssert("PvPHelper",  objPvPHelper.Message.Prefix, "objPvPHelper.Prefix")
-  TESTAssert("0888",  objPvPHelper.Message.Header, "objPvPHelper.Header")
-  TESTAssert("",  objPvPHelper.Message.Body, "objPvPHelper.Body")
-  
-  
-    -- Arrange
-  objPvPHelper = PvPHelper.new()
---Act
-  objPvPHelper.Message.From = "MyFriend001"
-  objPvPHelper:SendMessage("MySpells", "100,1234,98765")
-  --Assert
-  TESTAssert("PvPHelper",  objPvPHelper.Message.Prefix, "SendMessage1 objPvPHelper.Prefix")
-  TESTAssert("0020",  objPvPHelper.Message.Header, "SendMessage1 objPvPHelper.Header")
-  TESTAssert("0020:100,1234,98765",  objPvPHelper.Message.Body, "SendMessage1 objPvPHelper.Body")
-  TESTAssert("MyFriend001",  objPvPHelper.Message.To, "SendMessage1 objPvPHelper.To")
-
-  -- Arrange
-  objPvPHelper = PvPHelper.new()
-  --Act
-  objPvPHelper.Message.From = "JoeBloggs"
-  objPvPHelper:SendMessage("MySpells", "100,1234,98765")
-  --Assert
-  TESTAssert("PvPHelper",  objPvPHelper.Message.Prefix, "SendMessage2 objPvPHelper.Prefix")
-  TESTAssert("0020",  objPvPHelper.Message.Header, "SendMessage2 objPvPHelper.Header")
-  TESTAssert("0020:100,1234,98765",  objPvPHelper.Message.Body, "SendMessage2 objPvPHelper.Body")
-  TESTAssert("JoeBloggs",  objPvPHelper.Message.To, "SendMessage2 objPvPHelper.To")
-
-end
+ end
 
 
 function TEST_CCTYPES()
@@ -88,59 +52,30 @@ function TEST_MESSAGE_WHATSPELLSDOYOUHAVE()
   -- Arrange
   objPvPHelper = PvPHelper.new()
   
+  -- Set flags to log messages
+  DEBUG.LogMessages = true;
+  GVAR.MessageLog = {};
+
   -- Act
-  objPvPHelper:MessageReceived("PvPHelper", "0010", "WHISPER", "MrRaidLeader")   -- 0010 = WhatSpellsDoYouHave
+  objPvPHelper:MessageReceived("PvPHelperClient", "WhatSpellsDoYouHave", "WHISPER", "MrRaidLeader")   -- WhatSpellsDoYouHave = WhatSpellsDoYouHave
   -- Assert that when this message is received, it must automatically reply which spells we have.
   --objPvPHelper:SendMessage("MySpells", "100,1234,98765", "MyFriend001")
   --Assert
-  TESTAssert("PvPHelper", objPvPHelper.Message.Prefix, "AutoSendSpells - Prefix")
-  TESTAssert("0020", objPvPHelper.Message.Header, "AutoSendSpells - Header")
-  TESTAssert("0020:1776,2094", objPvPHelper.Message.Body, "AutoSendSpells - Body")
-  TESTAssert("MrRaidLeader", objPvPHelper.Message.To, "AutoSendSpells - To")
+  TESTAssert("MySpells", GVAR.MessageLog[1].Header, "AutoSendSpells - Header")
+  TESTAssert("1776,2094", GVAR.MessageLog[1].Payload2, "AutoSendSpells - Body")
+  TESTAssert("MrRaidLeader", GVAR.MessageLog[1].To, "AutoSendSpells - To")
 
-end
+  TESTAssert(1, table.getn(GVAR.MessageLog), "Should send reply to server only");
 
-function TEST_MESSAGE_SETCCTARGET()
-  -- Arrange
-  objPvPHelper = PvPHelper.new()
-  -- Act
-  objPvPHelper:MessageReceived("PvPHelper", "0030:GUIDBADPRIEST1234", "WHISPER", "MrRaidLeader")   -- 0030 = Set CC Target
-  --Assert that the CCTarget1 button is set to that GUID
-  TESTAssert("PvPHelper", objPvPHelper.Message.Prefix, "SetCCTarget - Prefix")
-  TESTAssert("0030", objPvPHelper.Message.Header, "SetCCTarget - Header")
-  TESTAssert("GUIDBADPRIEST1234", objPvPHelper.Message.Body, "SetCCTarget - Body")
-  TESTAssert("MrRaidLeader", objPvPHelper.Message.From, "SetCCTarget - From")
-  -- Now there must be the CCTarget set
-  TESTAssert("GUIDBADPRIEST1234", objPvPHelper.CCTarget, "SetCCTarget - CCTarget")
-  TESTAssert("Sahk", objPvPHelper.UI.CCTargetButton.Name.Text, "SetCCTarget - CCTargetButton.Name.Text")
-  TESTAssert(255, objPvPHelper.UI.CCTargetButton.colR, "SetCCTarget - CCTargetButton.colR")
-  TESTAssert(245, objPvPHelper.UI.CCTargetButton.colG, "SetCCTarget - CCTargetButton.colG")
-  TESTAssert(105, objPvPHelper.UI.CCTargetButton.colB, "SetCCTarget - CCTargetButton.colB")
-
-end
-
-function TEST_MESSAGE_SETMAINASSIST()
-  -- Arrange
-  objPvPHelper = PvPHelper.new()
-  -- Act
-  objPvPHelper:MessageReceived("PvPHelper", "0040:BUDDYGUID1234", "RAID")   -- 0030 = Set CC Target
-  --Assert that the CCTarget1 button is set to that GUID
-  TESTAssert("PvPHelper", objPvPHelper.Message.Prefix, "SetCCTarget - Prefix")
-  TESTAssert("0040", objPvPHelper.Message.Header, "SetCCTarget - Header")
-  TESTAssert("BUDDYGUID1234", objPvPHelper.Message.Body, "SetCCTarget - Body")
-  TESTAssert(nil, objPvPHelper.Message.From, "SetCCTarget - From")
-  -- Now there must be the CCTarget set
-  TESTAssert("BUDDYGUID1234", objPvPHelper.MainAssist, "SetCCTarget - MainAssit")
-  
 end
 
 function TEST_MESSAGE_DOACTIONNOW()
   -- Arrange
   objPvPHelper = PvPHelper.new()
   -- Act
-  objPvPHelper:MessageReceived("PvPHelper", "0060:1776", "WHISPER", "MrRaidLeader")   -- 0060 = DoActionNow
+  objPvPHelper:MessageReceived("PvPHelperClient", "ActNow.1776", "WHISPER", "MrRaidLeader")   -- ActNow = DoActionNow
   --Assert that the correct spell has been passed to the body 
-  TESTAssert("1776", objPvPHelper.Message.Body, "SetCCTarget - Body")
+  TESTAssert("1776", objPvPHelper.Message.Payload2, "SetCCTarget - Body")
   -- Tell the UI to do the action now
   -- The UI must show a message
   -- the UI should display a CCaction button
@@ -156,9 +91,9 @@ function TEST_MESSAGE_GETREADYFORACTION()
   -- Arrange
   objPvPHelper = PvPHelper.new()
   -- Act
-  objPvPHelper:MessageReceived("PvPHelper", "0050:1776", "WHISPER", "MrRaidLeader")   -- 0050 = GetReadyToAct
+  objPvPHelper:MessageReceived("PvPHelperClient", "PrepareToAct:1776", "WHISPER", "MrRaidLeader")   -- PrepareToAct = GetReadyToAct
   --Assert that the correct spell has been passed to the body 
-  TESTAssert("1776", objPvPHelper.Message.Body, "SetCCTarget - Body") -- 1776 = GOUGE
+  TESTAssert("1776", objPvPHelper.Message.Payload2, "SetCCTarget - Body") -- 1776 = GOUGE
   -- Tell the UI to do the action now
   -- The UI must show a message
   -- the UI should display a CCaction button
@@ -174,11 +109,11 @@ end
 function TEST_EVENT_CHATMESSAGE()
   -- Arrange
   objPvPHelper = PvPHelper.new()
-  PvPHelper_OnEvent(objPvPHelper.UI.MainFrame, "CHAT_MSG_ADDON", "PvPHelper", "0030:GUIDBADPRIEST1234", "WHISPER", "MrRaidLeader")   -- 0030 = Set CC Target
+  PvPHelper_OnEvent(objPvPHelper.UI.MainFrame, "CHAT_MSG_ADDON", "PvPHelperClient", "0030:GUIDBADPRIEST1234", "WHISPER", "MrRaidLeader")   -- 0030 = Set CC Target
   --Assert that the CCTarget1 button is set to that GUID
-  TESTAssert("PvPHelper", objPvPHelper.Message.Prefix, "SetCCTarget - Prefix")
+  TESTAssert("PvPHelperClient", objPvPHelper.Message.Prefix, "SetCCTarget - Prefix")
   TESTAssert("0030", objPvPHelper.Message.Header, "SetCCTarget - Header")
-  TESTAssert("GUIDBADPRIEST1234", objPvPHelper.Message.Body, "SetCCTarget - Body")
+  TESTAssert("GUIDBADPRIEST1234", objPvPHelper.Message.Payload2, "SetCCTarget - Body")
   TESTAssert("MrRaidLeader", objPvPHelper.Message.From, "SetCCTarget - From")
   -- Now there must be the CCTarget set
   TESTAssert("GUIDBADPRIEST1234", objPvPHelper.CCTarget, "SetCCTarget - CCTarget")
@@ -189,7 +124,7 @@ end
 function TEST_MESSAGE_CCSPELLHASBEENUSED()
   -- Arrange - Tell the PVPHelper to DoActionNow
   objPvPHelper = PvPHelper.new()
-  objPvPHelper:MessageReceived("PvPHelper", "0060:1776", "WHISPER", "MrRaidLeader")   -- 0060 = DoActionNow
+  objPvPHelper:MessageReceived("PvPHelperClient", "ActNow.1776", "WHISPER", "MrRaidLeader")   -- ActNow = DoActionNow
 
   -- This should have set up the CCSpellID to 1776 and the CCSpellNotified status to false.
   TESTAssert(1776, objPvPHelper.CCSpellId, "SET objPvPHelper.CCSpellId")
@@ -209,9 +144,9 @@ function TEST_MESSAGE_CCSPELLHASBEENUSED()
   -- So what should happen here is that we should see that this spell is now on cooldown and a message must
   -- be sent to the Server to say that this spell is now on Cooldown.
   
-  TESTAssert("PvPHelper", objPvPHelper.Message.Prefix, "Sent SpellIsOnCooldown - Prefix")
+  TESTAssert("PvPHelperClient", objPvPHelper.Message.Prefix, "Sent SpellIsOnCooldown - Prefix")
   TESTAssert("0080", objPvPHelper.Message.Header, "Sent SpellIsOnCooldown - Header")
-  TESTAssert("0080:1776", objPvPHelper.Message.Body, "Sent SpellIsOnCooldown - Body")
+  TESTAssert("0080:1776", objPvPHelper.Message.Payload2, "Sent SpellIsOnCooldown - Body")
   TESTAssert("MrRaidLeader", objPvPHelper.Message.To, "Sent SpellIsOnCooldown - To")
   
   TESTAssert("OnCooldown", objPvPHelper.SpellsOnCooldown[1776], "pvpHelper.SpellsOnCooldown[CCSpellId]")
@@ -229,9 +164,9 @@ function TEST_MESSAGE_CCSPELLHASBEENUSED()
   -- So what should happen here is that we should see that this spell is now on cooldown and a message must
   -- be sent to the Server to say that this spell is now on Cooldown.
   
-  TESTAssert("PvPHelper", objPvPHelper.Message.Prefix, "Sent ThisSpellIsOffCooldown - Prefix")
+  TESTAssert("PvPHelperClient", objPvPHelper.Message.Prefix, "Sent ThisSpellIsOffCooldown - Prefix")
   TESTAssert("0090", objPvPHelper.Message.Header, "Sent ThisSpellIsOffCooldown - Header")
-  TESTAssert("0090:1776", objPvPHelper.Message.Body, "Sent ThisSpellIsOffCooldown - Body")
+  TESTAssert("0090:1776", objPvPHelper.Message.Payload2, "Sent ThisSpellIsOffCooldown - Body")
   TESTAssert("MrRaidLeader", objPvPHelper.Message.To, "Sent ThisSpellIsOffCooldown - To")
   
   TESTAssert("nil", tostring(objPvPHelper.SpellsOnCooldown[1776]), "ThisSpellIsOffCooldown CCSpellId")
@@ -251,8 +186,6 @@ print("--START TESTS--\n")
 TEST_MESSAGES_RECEIVED()
 TEST_CCTYPES()
 TEST_MESSAGE_WHATSPELLSDOYOUHAVE()
-TEST_MESSAGE_SETCCTARGET()
-TEST_MESSAGE_SETMAINASSIST()
 TEST_MESSAGE_DOACTIONNOW()
 TEST_MESSAGE_GETREADYFORACTION()
 TEST_EVENT_CHATMESSAGE()
