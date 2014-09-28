@@ -25,7 +25,8 @@ end
 
 function PvPHelperClient:MyCCTypes()
 	local myCCTypes = CCTypeList.new();
-	
+  
+	local i, cctype
 	for i,cctype in ipairs(self.AllCCTypes) do
 		if IsPlayerSpell(cctype.SpellId) then
 			myCCTypes:Add(cctype)
@@ -83,14 +84,14 @@ end
 --end
 
 function PvPHelperClient:PrepareToAct(strMessage)
-	print("PVPHELPER: Asked to Prepare to act. Message "..strMessage);
+	print("DEBUG:PVPHELPER: Asked to Prepare to act. Message "..strMessage);
 
 	local messageSplit = string_split(strMessage, ",");
 
     local spellId = messageSplit[1]; -- Will Be "PrepareToAct"
     local secondsTime = messageSplit[2];
 	
-	print("Adding timer with duration = "..secondsTime);
+	print("DEBUG:PvPHelperClient:PrepareToAct:Adding timer with duration = "..secondsTime);
 	local timer = Timer.new({TimerId=spellId, Duration = secondsTime, parent=self})
 	self.Timers:Add(timer);
 	
@@ -103,7 +104,7 @@ function PvPHelperClient:Tick(seconds)
   if seconds == 5 then
     if self.Flags.Do5SecondsSound then
       self.Flags.Do5SecondsSound = true;
-      self.PlaySound("PrepareTo")
+      self:PlaySound("PrepareTo")
     end
   else
     self.Flags.Do5SecondsSound = nil;
@@ -111,7 +112,7 @@ function PvPHelperClient:Tick(seconds)
   if seconds == 3 then
     if self.Flags.Do3SecondsSound then
       self.Flags.Do3SecondsSound = true;
-      self.PlaySound("Countdown_3")
+      self:PlaySound("Countdown_3")
     end
   else
     self.Flags.Do3SecondsSound = nil;
@@ -119,7 +120,7 @@ function PvPHelperClient:Tick(seconds)
   if seconds == 2 then
     if self.Flags.Do2SecondsSound then
       self.Flags.Do2SecondsSound = true;
-      self.PlaySound("Countdown_3")
+      self:PlaySound("Countdown_3")
     end
   else
     self.Flags.Do2SecondsSound = nil;
@@ -127,7 +128,7 @@ function PvPHelperClient:Tick(seconds)
   if seconds == 1 then
     if self.Flags.Do1SecondsSound then
       self.Flags.Do1SecondsSound = true;
-      self.PlaySound("Countdown_3")
+      self:PlaySound("Countdown_3")
     end
   else
     self.Flags.Do1SecondsSound = nil;
@@ -137,29 +138,37 @@ end
 
 function PvPHelperClient:PlaySound(soundFileName)
   if (soundFileName) then
-  print(soundFileName);
-  if DEBUG.LogSound then
-    GVAR.PlaySound = soundFileName;
-  end
+    print("DEBUG: PvPHelperClient:PlaySound("..soundFileName..")");
+    if DEBUG and DEBUG.LogSound then
+      GVAR.PlaySound = soundFileName;
+    end
+  else
+    print("No soundfile passed");
   end 
 end
 
 function PvPHelperClient:DoCCActionNow(spellId)
---	print("PVPHELPER: ACT NOW on spellid"..spellId);
+  print("DEBUG: PVPHELPER: ACT NOW on spellid"..spellId);
+  
+  -- Reset the timers if any are running
+  self.UI:SetTimerText("")
+  self.Timers = TimerList.new();
+
 	self.UI:DoCCActionNow(spellId)
-  self.PlaySound("DoActionNow")
+  self:PlaySound("DoActionNow")
+  
 end
 
 function PvPHelperClient:DoLateCCAction(spellId)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:DoLateCCAction(spellId)
-  self.PlaySound("LateDoActionNow")
+  self:PlaySound("LateDoActionNow")
 end
 
 function PvPHelperClient:DoVeryLateCCAction(spellId)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:DoVeryLateCCAction(spellId)
-  self.PlaySound("VeryLateDoActionNow")
+  self:PlaySound("VeryLateDoActionNow")
 end
 
 function PvPHelperClient:RegisterMainFrameEvents(frame)
@@ -252,7 +261,7 @@ function PVPHelper_OnUpdate(frame, elapsed)
 		
 		local pvpHelper = frame.parent;
 
-		
+    local i, spell
 		for i, spell in ipairs( pvpHelper.SpellsOnCooldown) do
 			--print("Spell on cooldown:"..spell.CCName);
 			

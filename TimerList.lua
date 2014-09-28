@@ -25,7 +25,7 @@ function TimerList:Delete(timerId)
 	--print("FoundID="..tostring(foundId));
 	
   	if foundId then
-  		
+  	local i, timer	
 		for i,timer in ipairs(self) do
 			--print("BeltAndBraces-SELF-Lookup " ..i.." - " .. cctype.SpellId .. " " .. cctype.CCName);
 			if timer.TimerId == timerId then
@@ -53,6 +53,7 @@ function TimerList:LookupTimerId(timerId)
 end
 
 function TimerList:DeleteExpiredTimers()
+  local i, timer
 	for i, timer in ipairs(self) do
 		if not timer:IsActive() then
 			--print("Found and removed expired timer at " .. i);
@@ -62,6 +63,7 @@ function TimerList:DeleteExpiredTimers()
 end
 
 function TimerList:CheckTimers()
+  local i, timer
 	for i, timer in ipairs(self) do
 		if timer:IsActive() then
 			timer.parent:Tick(timer:TimeRemaining());
