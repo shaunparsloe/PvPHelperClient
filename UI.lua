@@ -11,49 +11,16 @@ function PvPHelper_UI.new (parentObject)
   self.parent = parentObject;
   self.MainFrame.parent = parentObject; -- Cyclical call back to self.  This is used so the eventhandler can pick up the object
 
-  -- Create Assist Button
-  local button = self:CreateStandardButton(self.MainFrame, 210, -100, "ASSIST")
-	button 	:SetScript("OnClick", function(self, button, down)
-		print("PvPHelper: Been asked which spells I have, reply with a list of my spells");
---		PVPHelper_MainFrame.parent:SendMessage("MySpells", PVPHelper_MainFrame.parent.CCTypes:ListSpellIds())
---		PVPHelper_MainFrame.parent:SendMessage("SpellCoolDown", "8122")	 - this works
---		PVPHelper_MainFrame.parent:SendMessage("SpellCoolDown", "15487")  - this crashes the system
---		PVPHelper_MainFrame.parent:SendMessage("SpellCoolDown", "SPELL-15487")
-
-		
-		--		pvpHelper:SendMessage23456("ThisSpellIsOnCooldown123456", tostring(ccType.SpellId))
-
-	  		--self:SendMessage("DummyTestMessage", nil, k.Name)
-
-	end)
-  self.AssistButton = button;
-  --Disable AssistButton
---  self:DisableButton(self.AssistButton);
---  
---  -- CC Target Button
---  button = nil;
---  button = self:CreatePlayerButton(self.MainFrame, "CCTARGET", 110, -10)
---  button:SetAttribute("type1", "macro") -- left click causes macro
---  button:SetAttribute("macrotext1", "/say Bye!"); -- text for macro on left click
---  self.CCTargetButton = button;
---  -- Disable
---  self:DisableButton(self.CCTargetButton);
-  
---  
---  for i, cctype in ipairs(parentObject.CCTypes) do
---    --if i==1 then
---    local button = self:CreateStandardButton(self.MainFrame, 220, (60*-i)+60, "CC NOW "..cctype.CCName)
---    
---    button:SetAttribute("unit", "target");
---    button:SetAttribute("type", "spell");
---    button:SetAttribute("spell", cctype.SpellId);
---    button.SpellId = cctype.SpellId;
---    button.SpellName = cctype.SpellName;
---    table.insert(self.CCActionButtons, button)
---    -- Disable
---    self:DisableButton(button);
---    --end
---  end
+--  -- Create Assist Button
+--  local button = self:CreateStandardButton(self.MainFrame, 210, -100, "ASSIST")
+--	button:SetScript("OnClick", 
+--    function(self, button, down)
+--      PlaySoundFile("Interface\\AddOns\\PvPHelperClient\\Sounds\\15487_Prepare.mp3");
+--      print("DEBUG: PvPHelperClient:PlaySound(Interface\\AddOns\\PvPHelperClient\\Sounds\\15487_Prepare.mp3)");
+--    end
+--    );
+--  self.AssistButton = button;
+ 
   return self;
   
 end
@@ -87,19 +54,19 @@ function PvPHelper_UI:CreateMainFrame()
   frame:SetUserPlaced(true);
 
 -- TODO: Run this and see where it appears!
-	fontstring = frame:CreateFontString("PVPHelperText", "ARTWORK","GameFontNormal")
+	local fontstring = frame:CreateFontString("PVPHelperText", "ARTWORK","GameFontNormal")
 	fontstring:SetPoint("TOPLEFT", -5, -15);
 	fontstring:SetSize(350, 12);
 	fontstring:SetText("fontstring set in UI.lua");
 	  
 	frame.StatusText = fontstring;
 
-  	fontstring = frame:CreateFontString("PVPHelperText", "ARTWORK","GameFontNormal")
-	fontstring:SetPoint("TOPLEFT", -5, -15);
-	fontstring:SetSize(350, 52);
-	fontstring:SetText("0");
+  local fontstring2 = frame:CreateFontString("PVPHelperText", "ARTWORK","GameFontNormal")
+	fontstring2:SetPoint("TOPLEFT", -5, -15);
+	fontstring2:SetSize(350, 52);
+	fontstring2:SetText("0");
 	  
-	frame.TimerText = fontstring;
+	frame.TimerText = fontstring2;
   
   
   frame.MessageText = frame:CreateFontString(nil, "OVERLAY", "GameFontNormal")
@@ -111,6 +78,8 @@ function PvPHelper_UI:CreateMainFrame()
   frame.MessageText:SetText("MESSAGETEXT");
 
 	self.MainFrame = frame;
+  
+  frame:Hide();
 end
 
 function PvPHelper_UI:DisableButton(button)  
@@ -267,175 +236,3 @@ function PvPHelper_UI:SetTimerText(param)
 	--print("Tick:"..tostring(param));
 	self.MainFrame.TimerText:SetText(param);
 end
-
-function PvPHelper_UI:SetCCButton(guid)
-  --print("Setting CC Target Button")
-  if (self.CCTargetButton) then
-    button = self.CCTargetButton;
-    
-    -- Calculate name, guid and class information
-    local class, classFileName, race, raceFilename, sex, name, realm = GetPlayerInfoByGUID(guid)
-    --print("SETCCBUTTON START")
-    --print("GUID = "..tostring(guid));
-    --print("class = "..tostring(class))
-    --print("classFileName = "..tostring(classFileName))
-    --print("race = "..tostring(race))
-    --print("raceFilename = "..tostring(raceFilename))
-    --print("sex = "..tostring(sex))
-    --print("name = "..tostring(name))
-    --print("realm = "..tostring(realm))
-    --print("SETCCBUTTON END")
-    
-    
-    button.Name:SetText(name)
-
-    --local fullname = UnitName(playername); 
-    --print("Fullname = "..tostring(fullname))
-    --local guid = UnitGUID(playername); 
-    --print("GUID = "..tostring(guid))
-    --local qclass, classFileName = UnitClass("target")
-    --print("Class = "..tostring(class))
-    --print("ClassFileName = "..tostring(classFileName))
-    
-    --  TODO: REmove once testing is over
-    -- this is only for testing 
-    if not class then
-      print("Unable to determine class - is this a player target?")
-      --class = "Warrior"
-      --classFileName = "WARRIOR"
-      name = UnitName("target")
-      class, classFileName = UnitClass("target")
-    end
-
-    -- Set up colours and bars
-    local qcolor = RAID_CLASS_COLORS[classFileName]
-    button.colR  = qcolor.r
-    button.colG  = qcolor.g
-    button.colB  = qcolor.b
-    button.ClassColorBackground:SetTexture(button.colR*.5, button.colG*.5, button.colB*.5, 1)
-    button.HealthBar:SetTexture(button.colR, button.colG, button.colB, 1)
-    
-    -- Health bar
-    local maxHealth = UnitHealthMax("target")
-    if maxHealth then
-      local health = UnitHealth("target")
-      SetButtonHealth(button, maxHealth, health);
-    end
-    
-    -- Set the macro so that on button click, it targets the player
-    if not inCombat or not InCombatLockdown() then
-      button:SetAttribute("macrotext1", "/target "..tostring(name))
-      --print("PVPHELPER: Set the CC Button Macro to /target "..name)
-    end
-
-
-   -- for i, CCActionButton in ipairs(self.CCActionButtons) do
-   --   print ("SEtting target to "..name)
-   --   CCActionButton:SetAttribute("unit", name);
-   -- end
-    
-    
-    -- Enable button
-    PvPHelper_UI:EnableButton(button);
-    
-    
-    
-  end
-end
-
-function PvPHelper_UI:SetMainAssist(guid)
-  local calledfrom = debug.getinfo(1).name;
-  print(tostring(calledfrom).." NOT IMPLEMENTED")
-end
-
-function PvPHelper_UI_SetupCCButtonWithClass(setbutton)
-  button = setbutton.SetButton;
-  local name = UnitName("target"); 
-  local guid = UnitGUID("target"); 
-  --print(name.." has the GUID: "..guid);
-  local targetID = UnitGUID("target"); 
-  local qname       = UnitName("target")
-  --print("Unitname = "..tostring(qname))
-  local qclass, qclassFileName = UnitClass("target")
-  --print("qclass = "..tostring(qclass)..", qclassFileName= "..tostring(qclassFileName))
-  local qcolor = RAID_CLASS_COLORS[qclassFileName]
-
-  local foe = Foe.new ({GUID=guid, Name=name, Class=strupper(qclass)})
-  button.Foe = foe;
-  local foundfoe = GVAR.PvPServer.FoeList:LookupGUID(guid)
-
-  if not foundfoe then
-    --print("ADDED FOE "..tostring(foe.Name).." (".. tostring(foe.GUID) ..") TO FOE LIST")
-    GVAR.PvPServer.FoeList:Add(deepcopy(foe));
-  else
-    --print("FOUND FOE "..tostring(foe.Name).." (".. tostring(foe.GUID) ..") IN FOE LIST")
-  end
-
-  print(qclass, qcolor.r, qcolor.g, qcolor.b)
-  
-
-  local qSpec = GetSpecialization("target")
-  print("qSpec = "..tostring(qSpec))
-
-  local qSpecName = qSpec and select(2, GetSpecializationInfo(qSpec)) or "None"
-  print("qSpecName = "..tostring(qSpecName))
-  local qInspectSpec =  GetInspectSpecialization("target") 
-  print("qInspectSpec = "..tostring(qInspectSpec))
-
-  local colR = qcolor.r
-  local colG = qcolor.g
-  local colB = qcolor.b
-  button.colR  = colR
-  button.colG  = colG
-  button.colB  = colB
-  button.colR5 = colR*0.5
-  button.colG5 = colG*0.5
-  button.colB5 = colB*0.5
-  button.ClassColorBackground:SetTexture(button.colR5, button.colG5, button.colB5, 1)
-  button.HealthBar:SetTexture(colR, colG, colB, 1)
-
-  --print("healthbar texture set")
-
-  button.Name:SetText(qname)
-  
-  if not inCombat or not InCombatLockdown() then
-    button:SetAttribute("macrotext1", "/target "..qname)
-    --print("Set the Macro to /target "..qname)
-  end
-
-  local maxHealth = UnitHealthMax("target")
-  if maxHealth then
-    local health = UnitHealth("target")
-    SetButtonHealth(button, maxHealth, health);
-  end
-
-  setbutton:Hide();
-  PvPHelper_UI:EnableButton(button);
-  return button;
-end
-
-
-function SetButtonHealth(button, maxHealth, health)
-  if maxHealth then
-    local healthBarWidth = button.ClassColorBackground:GetWidth();
-    if health then
-      local width = 0.01
-      local percent = 0
-      if maxHealth > 0 and health > 0 then
-        local hvalue = maxHealth / health
-        width = healthBarWidth / hvalue
-        width = math.max(0.01, width)
-        width = math.min(healthBarWidth, width)
-        percent = math.floor( (100/hvalue) + 0.5 )
-        percent = math.max(0, percent)
-        percent = math.min(100, percent)
-      end
-      --ENEMY_Name2Percent[targetName] = percent
---      print("health percent = ".. percent .."%")
-      button.HealthBar:SetWidth(width)
-      button.HealthText:SetText(percent)
-    end
-  end
-  return button;
-end
-

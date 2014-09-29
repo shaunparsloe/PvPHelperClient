@@ -1,6 +1,7 @@
 PvPHelperClient = {}
 PvPHelperClient.__index = PvPHelperClient; -- failed table lookups on the instances should fallback to the class table, to get methods
-
+PvPHelperClient_MainFrame = {}
+  
 GVAR = {};
 
 
@@ -19,7 +20,10 @@ function PvPHelperClient.new (options)
 	self.MyName = UnitName("player").."-"..GetRealmName();
 	self.UI = PvPHelper_UI.new(self);
 	self.Timers = TimerList.new();
-	print("DEBUG: PVPHELPER: Setting MainFrame.PvPHelperClient to self");
+  
+  PvPHelperClient_MainFrame = self.MainFrame;
+    
+	--print("DEBUG: PVPHELPER: Setting MainFrame.PvPHelperClient to self");
 	return self;
 end
 
@@ -28,20 +32,25 @@ function PvPHelperClient:MyCCTypes()
   
 	local i, cctype
 	for i,cctype in ipairs(self.AllCCTypes) do
+    print("Checking spell "..cctype.CCName);
 		if IsPlayerSpell(cctype.SpellId) then
 			myCCTypes:Add(cctype)
-			print("DEBUG: PVPHELPER: My CCType "..cctype.CCName);
+      print("DEBUG: PVPHELPER: My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
+    else
+      
 		end
 	end
 	return myCCTypes
 end
 
 function PvPHelperClient:MessageReceived(strPrefix, strMessage, strType, strSender)
-	print("DEBUG:PvPHelperClient:MessageReceived "..strMessage)
+ --print("DEBUG:PvPHelperClient:MessageReceived "..strMessage)
 	self.Message:Format(strPrefix, strMessage, strType, strSender)
-	print(tostring(self.Message.Header));
+	--print(tostring(self.Message.Header));
 	if (self.Message.Header)=="WhatSpellsDoYouHave" then -- 0010 = What spells do you have
-		print("DEBUGPvPHelper: Been asked which spells I have, reply with a list of my spells");
+	 --print("DEBUG:PvPHelper: Been asked which spells I have, reply with a list of my spells");
+    self.UI.MainFrame:Show();
+
 		self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
 	elseif (self.Message.Header)=="SetCCTarget" then -- 0030 = Set CCTarget
 		self:SetCCTarget(self.Message.Body)
@@ -61,7 +70,7 @@ function PvPHelperClient:MessageReceived(strPrefix, strMessage, strType, strSend
 end
 
 function PvPHelperClient:SendMessage(strMessage, strTarget)
-	-- print("DEBUG: Sending message to server("..self.Message.From..") "..strMessage.." - "..strTarget);
+	--print("DEBUG: Sending message to server("..self.Message.From..") "..strMessage.." - "..strTarget);
 	if (self.Message.From) then -- can only reply to server messages
 		--self.Message.Prefix = "NEWPvPHelper";
 		self.Message:SendMessagePrefixed("PvPHelperServer", strMessage, strTarget, self.Message.From);
@@ -69,66 +78,56 @@ function PvPHelperClient:SendMessage(strMessage, strTarget)
 end
 
 
-
-
---Conditional depending on test/live
---
---function PvPHelperClient:SetCCTarget(guid)
---	self.CCTarget = guid
---	self.UI:SetCCButton(self.CCTarget)
---end
---
---function PvPHelperClient:SetMainAssist(guid)
---	self.MainAssist = guid
---	UI_SetMainAssist(self.MainAssist)
---end
-
 function PvPHelperClient:PrepareToAct(strMessage)
-	print("DEBUG:PVPHELPER: Asked to Prepare to act. Message "..strMessage);
+ --print("DEBUG:PVPHELPER: Asked to Prepare to act. Message "..strMessage);
 
 	local messageSplit = string_split(strMessage, ",");
 
     local spellId = messageSplit[1]; -- Will Be "PrepareToAct"
     local secondsTime = messageSplit[2];
 	
-	print("DEBUG:PvPHelperClient:PrepareToAct:Adding timer with duration = "..secondsTime);
+ --print("DEBUG:PvPHelperClient:PrepareToAct:Adding timer with duration = "..secondsTime);
 	local timer = Timer.new({TimerId=spellId, Duration = secondsTime, parent=self})
 	self.Timers:Add(timer);
 	
 	self.UI:PrepareToAct(spellId, secondsTime)
+  self:PlaySound(spellId.."_Prepare.mp3")
 end
 
 
 function PvPHelperClient:Tick(seconds)
---	print("PVPHELPER: ACT NOW on spellid"..spellId);
+	--print("PVPHELPER: Tick("..seconds..")");
   if seconds == 5 then
     if self.Flags.Do5SecondsSound then
       self.Flags.Do5SecondsSound = true;
-      self:PlaySound("PrepareTo")
+      self:PlaySound(spellId.."_Prepare.mp3");
     end
   else
     self.Flags.Do5SecondsSound = nil;
   end
   if seconds == 3 then
-    if self.Flags.Do3SecondsSound then
+    --print("Ticking 3");
+    if not self.Flags.Do3SecondsSound then
+      --print("Playing 3");
       self.Flags.Do3SecondsSound = true;
-      self:PlaySound("Countdown_3")
+      self:PlaySound("Countdown_3.mp3")
     end
   else
+    --print("Clearing 3 flag");
     self.Flags.Do3SecondsSound = nil;
   end
   if seconds == 2 then
-    if self.Flags.Do2SecondsSound then
+    if not self.Flags.Do2SecondsSound then
       self.Flags.Do2SecondsSound = true;
-      self:PlaySound("Countdown_3")
+      self:PlaySound("Countdown_2.mp3")
     end
   else
     self.Flags.Do2SecondsSound = nil;
   end
   if seconds == 1 then
-    if self.Flags.Do1SecondsSound then
+    if not self.Flags.Do1SecondsSound then
       self.Flags.Do1SecondsSound = true;
-      self:PlaySound("Countdown_3")
+      self:PlaySound("Countdown_1.mp3")
     end
   else
     self.Flags.Do1SecondsSound = nil;
@@ -138,7 +137,10 @@ end
 
 function PvPHelperClient:PlaySound(soundFileName)
   if (soundFileName) then
-    print("DEBUG: PvPHelperClient:PlaySound("..soundFileName..")");
+    --print("DEBUG: PvPHelperClient:PlaySound(Interface\\AddOns\\PvPHelperClient\\Sounds\\"..soundFileName..")");
+
+    PlaySoundFile("Interface\\AddOns\\PvPHelperClient\\Sounds\\"..soundFileName)
+
     if DEBUG and DEBUG.LogSound then
       GVAR.PlaySound = soundFileName;
     end
@@ -148,27 +150,27 @@ function PvPHelperClient:PlaySound(soundFileName)
 end
 
 function PvPHelperClient:DoCCActionNow(spellId)
-  print("DEBUG: PVPHELPER: ACT NOW on spellid"..spellId);
+  --print("DEBUG: PVPHELPER: ACT NOW on spellid"..spellId);
   
   -- Reset the timers if any are running
   self.UI:SetTimerText("")
   self.Timers = TimerList.new();
 
 	self.UI:DoCCActionNow(spellId)
-  self:PlaySound("DoActionNow")
+  self:PlaySound(spellId.."_ActNow.mp3")
   
 end
 
 function PvPHelperClient:DoLateCCAction(spellId)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:DoLateCCAction(spellId)
-  self:PlaySound("LateDoActionNow")
+  self:PlaySound(spellId.."_LateActNow.mp3")
 end
 
 function PvPHelperClient:DoVeryLateCCAction(spellId)
 --	print("PVPHELPER: ACT NOW on spellid"..spellId);
 	self.UI:DoVeryLateCCAction(spellId)
-  self:PlaySound("VeryLateDoActionNow")
+  self:PlaySound(spellId.."_VeryLateActNow.mp3")
 end
 
 function PvPHelperClient:RegisterMainFrameEvents(frame)
@@ -211,18 +213,18 @@ function PvPHelper_OnEvent(frame, event, ...)
 --	.."|SF".. tostring(sourceFlags))
 	local ccType = frame.parent.CCTypes:LookupSpellId(sourceName);
 	if ccType then
-		print("This is one of my CC Spells");
+		--print("DEBUG:This is one of my CC Spells");
 		-- TODO: Remove this comment
 		-- Need to comment this out to try to debug why the system keeps crashing when 2x
 		-- ccTypes are run together
 		pvpHelper.SpellsOnCooldown:Add(ccType);
 		
-		pvpHelper:SendMessage("SpellCoolDown", "SPELL-"..tostring(ccType.SpellId))
+		pvpHelper:SendMessage("SpellCoolDown", tostring(ccType.SpellId))
 --		pvpHelper:SendMessage23456("ThisSpellIsOnCooldown123456", tostring(ccType.SpellId))
 --		self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
 
 	else
-		print("Not one of my CC Spells");
+		print("DEBUG:Not one of my CC Spells - spell ID="..sourceName);
 	end
 --	pvpHelper:SendMessage("ThisSpellIsOnCooldown", tostring(pvpHelper.CCSpellId))
 	
@@ -295,3 +297,12 @@ pvpHelper:RegisterMainFrameEvents(pvpHelper.UI.MainFrame)
 RegisterAddonMessagePrefix("PvPHelperClient");
 --RegisterAddonMessagePrefix("PvPHelperServer");
 
+SLASH_PVPHCLIENT1 = '/PvPHClient';
+local function handler(msg, editbox)
+ if msg == 'show' then
+  pvpHelper.UI.MainFrame:Show();
+ elseif msg == 'hide' then
+  pvpHelper.UI.MainFrame:Hide();
+ end
+end
+SlashCmdList["PVPHCLIENT"] = handler; -- Also a valid assignment strategy
