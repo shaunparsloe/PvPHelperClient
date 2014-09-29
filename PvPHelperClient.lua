@@ -33,7 +33,7 @@ function PvPHelperClient:MyCCTypes()
 	local i, cctype
 	for i,cctype in ipairs(self.AllCCTypes) do
     print("Checking spell "..cctype.CCName);
-		if IsPlayerSpell(cctype.SpellId) then
+		if DoesPlayerHaveSpell(cctype.SpellId) then
 			myCCTypes:Add(cctype)
       print("DEBUG: PVPHELPER: My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
     else
@@ -42,6 +42,7 @@ function PvPHelperClient:MyCCTypes()
 	end
 	return myCCTypes
 end
+
 
 function PvPHelperClient:MessageReceived(strPrefix, strMessage, strType, strSender)
  --print("DEBUG:PvPHelperClient:MessageReceived "..strMessage)
