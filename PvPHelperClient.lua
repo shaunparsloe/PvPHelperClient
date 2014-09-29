@@ -30,15 +30,21 @@ end
 function PvPHelperClient:MyCCTypes()
 	local myCCTypes = CCTypeList.new();
   
+  local localizedClass, myClass = UnitClass("player");
+  print("My Class is "..myClass);
 	local i, cctype
 	for i,cctype in ipairs(self.AllCCTypes) do
-    print("Checking spell "..cctype.CCName);
-		if DoesPlayerHaveSpell(cctype.SpellId) then
-			myCCTypes:Add(cctype)
-      print("DEBUG: PVPHELPER: My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
+    if myClass == cctype.Class then
+      print("Checking spell "..cctype.CCName);
+      if DoesPlayerHaveSpell(cctype.SpellId) then
+        myCCTypes:Add(cctype)
+        print("DEBUG: PVPHELPER: My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
+      else
+        print("DEBUG: PVPHELPER: NOT MY CC. Spell is ("..cctype.SpellId..") "..cctype.CCName);
+      end
     else
-      
-		end
+      print("DEBUG:Ignore ("..cctype.SpellId..") "..cctype.CCName.." as it is for "..cctype.Class.." and I am a "..myClass);
+    end
 	end
 	return myCCTypes
 end
