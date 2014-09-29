@@ -279,11 +279,11 @@ function PVPHelper_OnUpdate(frame, elapsed)
 			--print("Checking if ".. spell.SpellId.. " is useable");
 			
 			if enabled == 0 then
---				DEFAULT_CHAT_FRAME:AddMessage("Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
+--				print("Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
 			elseif ( start > 0 and duration > 0) then
---				DEFAULT_CHAT_FRAME:AddMessage("Spell is cooling down, wait " .. (start + duration - GetTime()) .. " seconds for the next one.");
+--				print("Spell is cooling down, wait " .. (start + duration - GetTime()) .. " seconds for the next one.");
 			else
---				DEFAULT_CHAT_FRAME:AddMessage("Spell is ready.");
+--				print("Spell is ready.");
 				pvpHelper.SpellsOnCooldown:Delete(spell);
 			 	pvpHelper:SendMessage("ThisSpellIsOffCooldown", tostring(spell.SpellId))
 			end
