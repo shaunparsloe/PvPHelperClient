@@ -30,15 +30,21 @@ end
 function PvPHelperClient:MyCCTypes()
 	local myCCTypes = CCTypeList.new();
   
+  local localizedClass, myClass = UnitClass("player");
+  print("My Class is "..myClass);
 	local i, cctype
 	for i,cctype in ipairs(self.AllCCTypes) do
-    print("Checking spell "..cctype.CCName);
-		if DoesPlayerHaveSpell(cctype.SpellId) then
-			myCCTypes:Add(cctype)
-      print("DEBUG: PVPHELPER: My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
+    if myClass == cctype.Class then
+      print("Checking spell "..cctype.CCName);
+      if DoesPlayerHaveSpell(cctype.SpellId) then
+        myCCTypes:Add(cctype)
+        print("DEBUG: PVPHELPER: My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
+      else
+        print("DEBUG: PVPHELPER: NOT MY CC. Spell is ("..cctype.SpellId..") "..cctype.CCName);
+      end
     else
-      
-		end
+      print("DEBUG:Ignore ("..cctype.SpellId..") "..cctype.CCName.." as it is for "..cctype.Class.." and I am a "..myClass);
+    end
 	end
 	return myCCTypes
 end
@@ -273,11 +279,11 @@ function PVPHelper_OnUpdate(frame, elapsed)
 			--print("Checking if ".. spell.SpellId.. " is useable");
 			
 			if enabled == 0 then
---				DEFAULT_CHAT_FRAME:AddMessage("Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
+--				print("Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
 			elseif ( start > 0 and duration > 0) then
---				DEFAULT_CHAT_FRAME:AddMessage("Spell is cooling down, wait " .. (start + duration - GetTime()) .. " seconds for the next one.");
+--				print("Spell is cooling down, wait " .. (start + duration - GetPvPClockTime()) .. " seconds for the next one.");
 			else
---				DEFAULT_CHAT_FRAME:AddMessage("Spell is ready.");
+--				print("Spell is ready.");
 				pvpHelper.SpellsOnCooldown:Delete(spell);
 			 	pvpHelper:SendMessage("ThisSpellIsOffCooldown", tostring(spell.SpellId))
 			end
