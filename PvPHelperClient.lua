@@ -281,7 +281,7 @@ function PVPHelper_OnUpdate(frame, elapsed)
 			if enabled == 0 then
 --				print("Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
 			elseif ( start > 0 and duration > 0) then
---				print("Spell is cooling down, wait " .. (start + duration - GetTime()) .. " seconds for the next one.");
+--				print("Spell is cooling down, wait " .. (start + duration - GetPvPClockTime()) .. " seconds for the next one.");
 			else
 --				print("Spell is ready.");
 				pvpHelper.SpellsOnCooldown:Delete(spell);

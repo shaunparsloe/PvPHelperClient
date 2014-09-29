@@ -10,16 +10,6 @@ function PvPHelper_UI.new (parentObject)
   
   self.parent = parentObject;
   self.MainFrame.parent = parentObject; -- Cyclical call back to self.  This is used so the eventhandler can pick up the object
-
---  -- Create Assist Button
---  local button = self:CreateStandardButton(self.MainFrame, 210, -100, "ASSIST")
---	button:SetScript("OnClick", 
---    function(self, button, down)
---      PlaySoundFile("Interface\\AddOns\\PvPHelperClient\\Sounds\\15487_Prepare.mp3");
---      print("DEBUG: PvPHelperClient:PlaySound(Interface\\AddOns\\PvPHelperClient\\Sounds\\15487_Prepare.mp3)");
---    end
---    );
---  self.AssistButton = button;
  
   return self;
   

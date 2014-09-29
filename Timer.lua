@@ -12,7 +12,7 @@ function Timer.new (options)
 		parent = options.parent,
 		TimerId = options.TimerId,
 		Duration = options.Duration, 
-		StartTime = GetTime(),
+		StartTime = GetPvPClockTime(),
 		ExecuteTime = options.ExecuteTime
 	}
 	, Timer)
@@ -37,7 +37,7 @@ end
 
 -- Restart for whatever the duration is.
 function Timer:Start()
-	self.StartTime = GetTime()
+	self.StartTime = GetPvPClockTime()
 	self.ExecuteTime = self.StartTime + self.Duration
 	return self
 end
@@ -45,7 +45,7 @@ end
 
 function Timer:IsActive()
 	local retval = false;
-	if (self.ExecuteTime > GetTime()) then
+	if (self.ExecuteTime > GetPvPClockTime()) then
 		retval = true;
 	else
 		retval = false;
@@ -55,7 +55,7 @@ function Timer:IsActive()
 end
 
 function Timer:TimeRemaining()
-	return self.ExecuteTime - GetTime();
+	return self.ExecuteTime - GetPvPClockTime();
 end
 
 
