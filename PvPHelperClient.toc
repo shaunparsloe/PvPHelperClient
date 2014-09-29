@@ -5,16 +5,17 @@
 ## SavedVariablesPerCharacter: PVPHelper_SavedOptions
 ## LoadOnDemand: 0
 ## DefaultState: enabled
-## Dependencies: DBM-Core, PvPHelperLibrary
+## Dependencies: PvPHelperLibrary
 ## Author: Vordermann
 Localization.lua
 
 UI.lua
-Utils.lua
 CCType.lua
 CCTypeList.lua
 Message.lua
+Timer.lua
+TimerList.lua
 
-PVPHelper.lua
+PVPHelperClient.lua
 
 
