@@ -231,7 +231,7 @@ function PvPHelper_OnEvent(frame, event, ...)
 --		self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
 
 	else
-		print("DEBUG:Not one of my CC Spells - spell ID="..sourceName);
+	  --print("DEBUG:Not one of my CC Spells - spell ID="..sourceName);
 	end
 --	pvpHelper:SendMessage("ThisSpellIsOnCooldown", tostring(pvpHelper.CCSpellId))
 	
