@@ -7,19 +7,23 @@ Timer.__index = Timer -- failed table lookups on the instances should fallback t
 -- Create this cover function to check mandatory and optional parameters for TimerS
 function Timer.new (options)
 	-- the new instance
+  if not options then
+    options = {}
+    options.Duration = 0;
+  end
 	local self = setmetatable(
 	{	
 		parent = options.parent,
-		TimerId = options.TimerId,
+		--TimerId = options.TimerId,
 		Duration = options.Duration, 
 		StartTime = GetPvPClockTime(),
 		ExecuteTime = options.ExecuteTime
 	}
 	, Timer)
 		
-	if not self.TimerId then
-		print("ERROR SETTING UP TIMER: MISSING TIMERID");
-	end
+--	if not self.TimerId then
+--		print("ERROR SETTING UP TIMER: MISSING TIMERID");
+--	end
 	
 	if self.Duration and not self.ExecuteTime then
 		self.ExecuteTime = self.StartTime + self.Duration;
@@ -29,7 +33,7 @@ function Timer.new (options)
 		self.Duration = self.ExecuteTime - self.StartTime;
 	end
 	
-	print("Added Timer: Duration: "..self.Duration..", executes: "..self.ExecuteTime);
+	--print("DEBUG:Timer.new():Added Timer: Duration: "..self.Duration..", executes: "..self.ExecuteTime);
 	
 	-- return the instance
 	return self;
