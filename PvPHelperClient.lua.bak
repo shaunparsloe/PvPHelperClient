@@ -38,12 +38,12 @@ function PvPHelperClient:MyCCTypes()
       print("Checking spell "..cctype.CCName);
       if DoesPlayerHaveSpell(cctype.SpellId) then
         myCCTypes:Add(cctype)
-        --print("DEBUG: PVPHELPER: My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
+        print("DEBUG: PVPHELPER: My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
       else
-        --print("DEBUG: PVPHELPER: NOT MY CC. Spell is ("..cctype.SpellId..") "..cctype.CCName);
+        print("DEBUG: PVPHELPER: NOT MY CC. Spell is ("..cctype.SpellId..") "..cctype.CCName);
       end
     else
-      --print("DEBUG:Ignore ("..cctype.SpellId..") "..cctype.CCName.." as it is for "..cctype.Class.." and I am a "..myClass);
+      print("DEBUG:Ignore ("..cctype.SpellId..") "..cctype.CCName.." as it is for "..cctype.Class.." and I am a "..myClass);
     end
 	end
 	return myCCTypes
