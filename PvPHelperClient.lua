@@ -31,16 +31,16 @@ function PvPHelperClient:MyCCTypes()
 	local myCCTypes = CCTypeList.new();
   
   local localizedClass, myClass = UnitClass("player");
-  --print("DEBUG:PvPHelperClient:MyCCTypes(): My Class is "..myClass);
+  print("DEBUG:PvPHelperClient:MyCCTypes(): My Class is "..myClass);
 	local i, cctype
 	for i,cctype in ipairs(self.AllCCTypes) do
     if myClass == cctype.Class then
-      --print("DEBUG:PvPHelperClient:MyCCTypes(): Checking spell "..cctype.CCName);
+      print("DEBUG:PvPHelperClient:MyCCTypes(): Checking spell "..cctype.CCName);
       if DoesPlayerHaveSpell(cctype.SpellId) then
         myCCTypes:Add(cctype)
-        --print("DEBUG: PvPHelperClient:MyCCTypes(): My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
+        print("DEBUG: PvPHelperClient:MyCCTypes(): My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
       else
-        --print("DEBUG: PvPHelperClient:MyCCTypes(): NOT MY CC. Spell is ("..cctype.SpellId..") "..cctype.CCName);
+        print("DEBUG: PvPHelperClient:MyCCTypes(): NOT MY CC. Spell is ("..cctype.SpellId..") "..cctype.CCName);
       end
     else
       --print("DEBUG:PvPHelperClient:MyCCTypes():Ignore ("..cctype.SpellId..") "..cctype.CCName.." as it is for "..cctype.Class.." and I am a "..myClass);
@@ -55,9 +55,8 @@ function PvPHelperClient:MessageReceived(strPrefix, strMessage, strType, strSend
 	self.Message:Format(strPrefix, strMessage, strType, strSender)
 	--print(tostring(self.Message.Header));
 	if (self.Message.Header)=="WhatSpellsDoYouHave" then -- 0010 = What spells do you have
-	 --print("DEBUG:PvPHelper: Been asked which spells I have, reply with a list of my spells");
+	 print("DEBUG:PvPHelper: Been asked which spells I have, reply with a list of my spells:"..self.CCTypes:ListSpellIds());
     self.UI.MainFrame:Show();
-
 		self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
 	elseif (self.Message.Header)=="SetCCTarget" then -- 0030 = Set CCTarget
 		self:SetCCTarget(self.Message.Body)
