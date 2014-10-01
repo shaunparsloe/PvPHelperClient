@@ -1,6 +1,6 @@
 ## Interface: 50400
 ## X-Min-Interface: 50001
-## Title:|cffffd200PVP Helper|r
+## Title:|cffffd200PVP Helper|r |cff69ccf0Client|r
 ## Notes: PVP Helper - Main Target selector and CC Caller
 ## SavedVariablesPerCharacter: PVPHelper_SavedOptions
 ## LoadOnDemand: 0
