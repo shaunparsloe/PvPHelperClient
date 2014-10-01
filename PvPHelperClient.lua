@@ -19,7 +19,7 @@ function PvPHelperClient.new (options)
 	self.InCombat = false;
 	self.MyName = UnitName("player").."-"..GetRealmName();
 	self.UI = PvPHelper_UI.new(self);
-	self.Timers = TimerList.new();
+	self.Timer = Timer.new();
   
   PvPHelperClient_MainFrame = self.MainFrame;
     
@@ -31,19 +31,19 @@ function PvPHelperClient:MyCCTypes()
 	local myCCTypes = CCTypeList.new();
   
   local localizedClass, myClass = UnitClass("player");
-  print("My Class is "..myClass);
+  --print("DEBUG:PvPHelperClient:MyCCTypes(): My Class is "..myClass);
 	local i, cctype
 	for i,cctype in ipairs(self.AllCCTypes) do
     if myClass == cctype.Class then
-      print("Checking spell "..cctype.CCName);
+      --print("DEBUG:PvPHelperClient:MyCCTypes(): Checking spell "..cctype.CCName);
       if DoesPlayerHaveSpell(cctype.SpellId) then
         myCCTypes:Add(cctype)
-        --print("DEBUG: PVPHELPER: My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
+        --print("DEBUG: PvPHelperClient:MyCCTypes(): My CC Spell is ("..cctype.SpellId..") "..cctype.CCName);
       else
-        --print("DEBUG: PVPHELPER: NOT MY CC. Spell is ("..cctype.SpellId..") "..cctype.CCName);
+        --print("DEBUG: PvPHelperClient:MyCCTypes(): NOT MY CC. Spell is ("..cctype.SpellId..") "..cctype.CCName);
       end
     else
-      --print("DEBUG:Ignore ("..cctype.SpellId..") "..cctype.CCName.." as it is for "..cctype.Class.." and I am a "..myClass);
+      --print("DEBUG:PvPHelperClient:MyCCTypes():Ignore ("..cctype.SpellId..") "..cctype.CCName.." as it is for "..cctype.Class.." and I am a "..myClass);
     end
 	end
 	return myCCTypes
@@ -95,7 +95,7 @@ function PvPHelperClient:PrepareToAct(strMessage)
 	
  --print("DEBUG:PvPHelperClient:PrepareToAct:Adding timer with duration = "..secondsTime);
 	local timer = Timer.new({TimerId=spellId, Duration = secondsTime, parent=self})
-	self.Timers:Add(timer);
+	self.Timer = timer;
 	
 	self.UI:PrepareToAct(spellId, secondsTime)
   self:PlaySound(spellId.."_Prepare.mp3")
@@ -159,9 +159,9 @@ end
 function PvPHelperClient:DoCCActionNow(spellId)
   --print("DEBUG: PVPHELPER: ACT NOW on spellid"..spellId);
   
-  -- Reset the timers if any are running
+  -- Reset the timer if it is running
   self.UI:SetTimerText("")
-  self.Timers = TimerList.new();
+  self.Timer = Timer.new();
 
 	self.UI:DoCCActionNow(spellId)
   self:PlaySound(spellId.."_ActNow.mp3")
@@ -191,7 +191,7 @@ function PvPHelperClient:RegisterMainFrameEvents(frame)
 		frame:RegisterEvent("PLAYER_REGEN_DISABLED");
 			frame:RegisterEvent("PLAYER_REGEN_ENABLED");
 
-	print ("PVPHELPER - setting script");
+	--print ("DEBUG:PvPHelperClient:RegisterMainFrameEvents(frame) - setting script");
 	frame:SetScript("OnEvent", PvPHelper_OnEvent)
 
 end
@@ -231,7 +231,7 @@ function PvPHelper_OnEvent(frame, event, ...)
 --		self:SendMessage("MySpells", self.CCTypes:ListSpellIds())
 
 	else
-		print("DEBUG:Not one of my CC Spells - spell ID="..sourceName);
+	  --print("DEBUG:Not one of my CC Spells - spell ID="..sourceName);
 	end
 --	pvpHelper:SendMessage("ThisSpellIsOnCooldown", tostring(pvpHelper.CCSpellId))
 	
@@ -250,13 +250,16 @@ end
 
 function PVPHelper_OnUpdate(frame, elapsed)
 
+  local pvpHelper = frame.parent;
+
 	-- Countdown timer tick
 	frame.TimerTick = frame.TimerTick + elapsed; 	
 	if (frame.TimerTick > 0.1) then
-		local pvpHelper = frame.parent;
 
-		pvpHelper.Timers:CheckTimers();
-
+		if pvpHelper.Timer:IsActive() then
+			pvpHelper:Tick(pvpHelper.Timer:TimeRemaining());
+    end
+    
 		frame.TimerTick = 0;
 	end
 	
@@ -268,7 +271,6 @@ function PVPHelper_OnUpdate(frame, elapsed)
 		
 		-- If we have notified the server that it's on cooldown, but now it's available, tell the server.
 		
-		local pvpHelper = frame.parent;
 
     local i, spell
 		for i, spell in ipairs( pvpHelper.SpellsOnCooldown) do
