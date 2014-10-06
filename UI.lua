@@ -198,7 +198,7 @@ function PvPHelper_UI:DoLateCCAction(spellId)
   if objSpell then
     self.MainFrame.StatusText:SetText("LATE! Do "..objSpell.CCName.." NOW!");
   else
-    print("PvPHelper_UI:DoCCActionNow: CANNOT FIND SPELL:"..spellId);
+    print("PvPHelper_UI:DoLateCCActionNow: CANNOT FIND SPELL:"..spellId);
   end
 
 end
@@ -209,7 +209,7 @@ function PvPHelper_UI:DoVeryLateCCAction(spellId)
   if objSpell then
     self.MainFrame.StatusText:SetText("VERY LATE! Do "..objSpell.CCName.." NOW!");
   else
-    print("PvPHelper_UI:DoCCActionNow: CANNOT FIND SPELL:"..spellId);
+    print("PvPHelper_UI:DoVeryLateCCActionNow: CANNOT FIND SPELL:"..spellId);
   end
 
 end

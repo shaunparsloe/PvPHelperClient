@@ -71,7 +71,7 @@ function PvPHelperClient:MessageReceived(strPrefix, strMessage, strType, strSend
   elseif (self.Message.Header)=="VeryLateActNow" then -- 0060 = DoActionNow
     self:DoVeryLateCCAction(self.Message.Body);
   else
-    print("DEBUG:PvPHelperClient:MessageReceived: Unknown message header: "..tostring(self.Message.Header));
+    --print("DEBUG:PvPHelperClient:MessageReceived: Unknown message header: "..tostring(self.Message.Header));
   end
 end
 
@@ -240,7 +240,7 @@ function PvPHelper_OnEvent(frame, event, ...)
     if (timestamp == "PvPHelperClient") then
       pvpHelper:MessageReceived(tostring(timestamp), tostring(Event), tostring(hideCaster), tostring(sourceGUID))
 --  else
---    print("DEBUG:PvpHelperClient ERROR Message Received with stamp "..timestamp)
+    --print("DEBUG:PvpHelperClient ERROR Message Received with stamp "..timestamp)
     end
 
     
@@ -280,11 +280,11 @@ function PVPHelper_OnUpdate(frame, elapsed)
       --print("Checking if ".. spell.SpellId.. " is useable");
       
       if enabled == 0 then
---        print("DEBUG:Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
+        --print("DEBUG:Spell is currently active, use it and wait " .. duration .. " seconds for the next one.");
       elseif ( start > 0 and duration > 0) then
---        print("DEBUG:Spell is cooling down, wait " .. (start + duration - GetPvPClockTime()) .. " seconds for the next one.");
+        --print("DEBUG:Spell is cooling down, wait " .. (start + duration - GetPvPClockTime()) .. " seconds for the next one.");
       else
---        print("DEBUG:Spell is ready.");
+        --print("DEBUG:Spell is ready.");
         pvpHelper.SpellsOnCooldown:Delete(spell);
          pvpHelper:SendMessage("ThisSpellIsOffCooldown", tostring(spell.SpellId))
       end
