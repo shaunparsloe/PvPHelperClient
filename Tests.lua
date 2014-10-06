@@ -117,18 +117,18 @@ function TEST_MESSAGE_PREPARETOACT()
   
   -- Rubbish.  TODO: Fix this bit:
    TESTAssert(0, table.getn(GVAR.MessageLog), "Should send new messages to server");
-	TESTAssert(true, objPvPHelperClient.Timer:IsActive(),"Should have an Active timer")
+  TESTAssert(true, objPvPHelperClient.Timer:IsActive(),"Should have an Active timer")
   
-	TESTAssert(10, objPvPHelperClient.Timer:TimeRemaining(),"With 10 second duration")
+  TESTAssert(10, objPvPHelperClient.Timer:TimeRemaining(),"With 10 second duration")
 
   DEBUG.SetClockSeconds = 105;
-	TESTAssert(5, objPvPHelperClient.Timer:TimeRemaining(),"With 5 sec remaining")
+  TESTAssert(5, objPvPHelperClient.Timer:TimeRemaining(),"With 5 sec remaining")
 
   elapsed = 1;
   PVPHelper_OnUpdate(objPvPHelperClient.UI.MainFrame, elapsed) 
 
    TESTAssert(0, table.getn(GVAR.MessageLog), "Should send new messages to server");
-	TESTAssert(5, objPvPHelperClient.Timer:TimeRemaining(),"With 5 sec remaining")
+  TESTAssert(5, objPvPHelperClient.Timer:TimeRemaining(),"With 5 sec remaining")
 
 end
 
