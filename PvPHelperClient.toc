@@ -5,8 +5,10 @@
 ## SavedVariablesPerCharacter: PVPHelper_SavedOptions
 ## LoadOnDemand: 0
 ## DefaultState: enabled
+## Version: 1.0
 ## Dependencies: PvPHelperLibrary
 ## Author: Vordermann
+
 Localization.lua
 
 UI.lua
